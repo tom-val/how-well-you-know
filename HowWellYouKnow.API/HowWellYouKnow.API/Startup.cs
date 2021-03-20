@@ -1,7 +1,9 @@
+using HowWellYouKnow.Infrastructure;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.SpaServices.AngularCli;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -26,6 +28,8 @@ namespace HowWellYouKnow.API
             {
                 configuration.RootPath = "ClientApp/dist";
             });
+
+            services.AddDbContext<DatabaseContext>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -70,6 +74,11 @@ namespace HowWellYouKnow.API
                     spa.UseAngularCliServer(npmScript: "start");
                 }
             });
+
+            using (var scope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope())
+            {
+                scope.ServiceProvider.GetService<DatabaseContext>().Database.Migrate();
+            }
         }
     }
 }
