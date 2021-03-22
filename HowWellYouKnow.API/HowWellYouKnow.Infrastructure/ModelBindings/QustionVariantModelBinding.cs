@@ -7,18 +7,14 @@ using System.Text;
 
 namespace HowWellYouKnow.Infrastructure.ModelBindings
 {
-    public class QustionModelBinding : IEntityTypeConfiguration<Question>
+    public class QustionVariantModelBinding : IEntityTypeConfiguration<QuestionVariant>
     {
-        public void Configure(EntityTypeBuilder<Question> builder)
+        public void Configure(EntityTypeBuilder<QuestionVariant> builder)
         {
             builder
                 .Property(x => x.Name)
                 .IsRequired()
-                .HasMaxLength(200);
-
-            builder.HasMany(x => x.Variants)
-                .WithOne(x => x.Question)
-                .HasForeignKey(x => x.QuestionId);
+                .HasMaxLength(50);
         }
     }
 }

@@ -3,14 +3,16 @@ using System;
 using HowWellYouKnow.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace HowWellYouKnow.Infrastructure.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    partial class DatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20210321081712_AdditionalTables")]
+    partial class AdditionalTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -79,7 +81,7 @@ namespace HowWellYouKnow.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Answers");
+                    b.ToTable("Answer");
                 });
 
             modelBuilder.Entity("HowWellYouKnow.Domain.Models.Game", b =>
@@ -94,11 +96,6 @@ namespace HowWellYouKnow.Infrastructure.Migrations
                     b.Property<Guid>("GameStateId")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("TEXT");
-
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedByUserId");
@@ -106,7 +103,7 @@ namespace HowWellYouKnow.Infrastructure.Migrations
                     b.HasIndex("GameStateId")
                         .IsUnique();
 
-                    b.ToTable("Games");
+                    b.ToTable("Game");
                 });
 
             modelBuilder.Entity("HowWellYouKnow.Domain.Models.GameState", b =>
@@ -118,13 +115,7 @@ namespace HowWellYouKnow.Infrastructure.Migrations
                     b.Property<int>("CurrentGameState")
                         .HasColumnType("INTEGER");
 
-                    b.Property<Guid?>("CurrentQuestionId")
-                        .HasColumnType("TEXT");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("CurrentQuestionId")
-                        .IsUnique();
 
                     b.ToTable("GameState");
                 });
@@ -152,7 +143,7 @@ namespace HowWellYouKnow.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Guesses");
+                    b.ToTable("Guess");
                 });
 
             modelBuilder.Entity("HowWellYouKnow.Domain.Models.Question", b =>
@@ -162,9 +153,6 @@ namespace HowWellYouKnow.Infrastructure.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<Guid>("GameId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid?>("GameStateId")
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("MultipleAnswers")
@@ -222,10 +210,7 @@ namespace HowWellYouKnow.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Name")
-                        .IsUnique();
-
-                    b.ToTable("Users");
+                    b.ToTable("User");
                 });
 
             modelBuilder.Entity("HowWellYouKnow.Domain.Models.UserAnswerResult", b =>
@@ -249,7 +234,7 @@ namespace HowWellYouKnow.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserAnswerResults");
+                    b.ToTable("UserAnswerResult");
                 });
 
             modelBuilder.Entity("HowWellYouKnow.Domain.Models.UserGameScore", b =>
@@ -278,32 +263,17 @@ namespace HowWellYouKnow.Infrastructure.Migrations
 
             modelBuilder.Entity("QuestionVariantUserAnswerResult", b =>
                 {
-                    b.Property<Guid>("AnswerQuestionVariantsId")
-                        .HasColumnType("TEXT");
-
                     b.Property<Guid>("AnswerResultsId")
                         .HasColumnType("TEXT");
 
-                    b.HasKey("AnswerQuestionVariantsId", "AnswerResultsId");
+                    b.Property<Guid>("QuestionVariantsId")
+                        .HasColumnType("TEXT");
 
-                    b.HasIndex("AnswerResultsId");
+                    b.HasKey("AnswerResultsId", "QuestionVariantsId");
+
+                    b.HasIndex("QuestionVariantsId");
 
                     b.ToTable("QuestionVariantUserAnswerResult");
-                });
-
-            modelBuilder.Entity("QuestionVariantUserAnswerResult1", b =>
-                {
-                    b.Property<Guid>("GuessQuestionVariantsId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid>("GuessResultsId")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("GuessQuestionVariantsId", "GuessResultsId");
-
-                    b.HasIndex("GuessResultsId");
-
-                    b.ToTable("QuestionVariantUserAnswerResult1");
                 });
 
             modelBuilder.Entity("AnswerQuestionVariant", b =>
@@ -387,15 +357,6 @@ namespace HowWellYouKnow.Infrastructure.Migrations
                     b.Navigation("CreatedBy");
 
                     b.Navigation("GameState");
-                });
-
-            modelBuilder.Entity("HowWellYouKnow.Domain.Models.GameState", b =>
-                {
-                    b.HasOne("HowWellYouKnow.Domain.Models.Question", "CurrentQuestion")
-                        .WithOne("GameState")
-                        .HasForeignKey("HowWellYouKnow.Domain.Models.GameState", "CurrentQuestionId");
-
-                    b.Navigation("CurrentQuestion");
                 });
 
             modelBuilder.Entity("HowWellYouKnow.Domain.Models.Guess", b =>
@@ -487,30 +448,15 @@ namespace HowWellYouKnow.Infrastructure.Migrations
 
             modelBuilder.Entity("QuestionVariantUserAnswerResult", b =>
                 {
-                    b.HasOne("HowWellYouKnow.Domain.Models.QuestionVariant", null)
-                        .WithMany()
-                        .HasForeignKey("AnswerQuestionVariantsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("HowWellYouKnow.Domain.Models.UserAnswerResult", null)
                         .WithMany()
                         .HasForeignKey("AnswerResultsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
 
-            modelBuilder.Entity("QuestionVariantUserAnswerResult1", b =>
-                {
                     b.HasOne("HowWellYouKnow.Domain.Models.QuestionVariant", null)
                         .WithMany()
-                        .HasForeignKey("GuessQuestionVariantsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("HowWellYouKnow.Domain.Models.UserAnswerResult", null)
-                        .WithMany()
-                        .HasForeignKey("GuessResultsId")
+                        .HasForeignKey("QuestionVariantsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -532,8 +478,6 @@ namespace HowWellYouKnow.Infrastructure.Migrations
                     b.Navigation("AnswerResults");
 
                     b.Navigation("Answers");
-
-                    b.Navigation("GameState");
 
                     b.Navigation("Guesses");
 

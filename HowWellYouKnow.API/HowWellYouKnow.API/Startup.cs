@@ -1,4 +1,8 @@
+using HowWellYouKnow.API.Hubs;
+using HowWellYouKnow.API.Services;
 using HowWellYouKnow.Infrastructure;
+using HowWellYouKnow.Infrastructure.Repositories;
+using HowWellYouKnow.Infrastructure.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -29,6 +33,21 @@ namespace HowWellYouKnow.API
                 configuration.RootPath = "ClientApp/dist";
             });
 
+            services.AddSignalR();
+
+            services.AddScoped<GameRepository>();
+            services.AddScoped<GameReadService>();
+            services.AddScoped<GameService>();
+            services.AddScoped<UserRepository>();
+            services.AddScoped<UserService>();
+            services.AddScoped<QuestionRepository>();
+            services.AddScoped<QuestionsService>();
+            services.AddScoped<GameStatusService>();
+            services.AddScoped<AnswerRepository>();
+            services.AddScoped<AnswerResultRepository>();
+            services.AddScoped<GuessRepository>();
+            services.AddScoped<AnswerService>();
+
             services.AddDbContext<DatabaseContext>();
         }
 
@@ -57,6 +76,8 @@ namespace HowWellYouKnow.API
 
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapHub<QuestionsHub>("/questions");
+                endpoints.MapHub<GameStateHub>("/gameState");
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller}/{action=Index}/{id?}");

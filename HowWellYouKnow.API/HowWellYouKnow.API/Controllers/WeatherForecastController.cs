@@ -31,9 +31,30 @@ namespace HowWellYouKnow.API.Controllers
         public IEnumerable<WeatherForecast> Get()
         {
             var rng = new Random();
+            var gameGuid = Guid.NewGuid();
+            var userId = Guid.NewGuid();
+
+            context.Users.Add(new User
+            {
+                Id = userId,
+                Name = "Tomas"
+            });
+
+            context.Games.Add(new Game
+            {
+                Id = gameGuid,
+                CreatedByUserId = userId,
+                GameState = new GameState
+                {
+                    CurrentGameState = Domain.Enums.CurrentGameState.NotStarted
+                }
+            });
+
             context.Questions.Add(new Question
             {
-                Name = "TEST"
+                Name = "TEST",
+                MultipleAnswers = true,
+                GameId = gameGuid
             });
             context.SaveChanges();
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast

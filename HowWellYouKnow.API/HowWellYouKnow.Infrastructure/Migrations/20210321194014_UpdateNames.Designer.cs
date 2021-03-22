@@ -3,14 +3,16 @@ using System;
 using HowWellYouKnow.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace HowWellYouKnow.Infrastructure.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    partial class DatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20210321194014_UpdateNames")]
+    partial class UpdateNames
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -278,32 +280,17 @@ namespace HowWellYouKnow.Infrastructure.Migrations
 
             modelBuilder.Entity("QuestionVariantUserAnswerResult", b =>
                 {
-                    b.Property<Guid>("AnswerQuestionVariantsId")
-                        .HasColumnType("TEXT");
-
                     b.Property<Guid>("AnswerResultsId")
                         .HasColumnType("TEXT");
 
-                    b.HasKey("AnswerQuestionVariantsId", "AnswerResultsId");
+                    b.Property<Guid>("QuestionVariantsId")
+                        .HasColumnType("TEXT");
 
-                    b.HasIndex("AnswerResultsId");
+                    b.HasKey("AnswerResultsId", "QuestionVariantsId");
+
+                    b.HasIndex("QuestionVariantsId");
 
                     b.ToTable("QuestionVariantUserAnswerResult");
-                });
-
-            modelBuilder.Entity("QuestionVariantUserAnswerResult1", b =>
-                {
-                    b.Property<Guid>("GuessQuestionVariantsId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid>("GuessResultsId")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("GuessQuestionVariantsId", "GuessResultsId");
-
-                    b.HasIndex("GuessResultsId");
-
-                    b.ToTable("QuestionVariantUserAnswerResult1");
                 });
 
             modelBuilder.Entity("AnswerQuestionVariant", b =>
@@ -487,30 +474,15 @@ namespace HowWellYouKnow.Infrastructure.Migrations
 
             modelBuilder.Entity("QuestionVariantUserAnswerResult", b =>
                 {
-                    b.HasOne("HowWellYouKnow.Domain.Models.QuestionVariant", null)
-                        .WithMany()
-                        .HasForeignKey("AnswerQuestionVariantsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("HowWellYouKnow.Domain.Models.UserAnswerResult", null)
                         .WithMany()
                         .HasForeignKey("AnswerResultsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
 
-            modelBuilder.Entity("QuestionVariantUserAnswerResult1", b =>
-                {
                     b.HasOne("HowWellYouKnow.Domain.Models.QuestionVariant", null)
                         .WithMany()
-                        .HasForeignKey("GuessQuestionVariantsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("HowWellYouKnow.Domain.Models.UserAnswerResult", null)
-                        .WithMany()
-                        .HasForeignKey("GuessResultsId")
+                        .HasForeignKey("QuestionVariantsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

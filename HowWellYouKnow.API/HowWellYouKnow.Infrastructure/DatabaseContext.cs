@@ -10,6 +10,11 @@ namespace HowWellYouKnow.Infrastructure
     public class DatabaseContext : DbContext
     {
         public DbSet<Question> Questions { get; set; }
+        public DbSet<Game> Games { get; set; }
+        public DbSet<User> Users { get; set; }
+        public DbSet<Answer> Answers { get; set; }
+        public DbSet<Guess> Guesses { get; set; }
+        public DbSet<UserAnswerResult> UserAnswerResults { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder options)
             => options.UseSqlite(@"Data Source=./questions.db");
