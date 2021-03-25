@@ -2,7 +2,8 @@
 import { HttpClient } from "@angular/common/http";
 import { Component, Inject, OnInit } from "@angular/core";
 import { FormBuilder, FormControl, FormGroup, Validators } from "@angular/forms";
-import {MAT_DIALOG_DATA, MatDialogRef, MatSnackBar} from "@angular/material";
+import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material/dialog";
+import { MatSnackBar } from "@angular/material/snack-bar";
 import { QuestionDto } from "../dtos/question-dto.model";
 import { QuestionVariantDto } from "../dtos/questionVariant-dto.model";
 

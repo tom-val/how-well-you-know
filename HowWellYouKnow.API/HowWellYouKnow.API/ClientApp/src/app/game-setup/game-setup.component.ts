@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Inject, Input, OnInit, Output } from '@angular/core';
-import { MatDialog, MatDialogConfig, MatSnackBar } from '@angular/material';
+import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { CreateQuestionDialogComponent } from '../question-dialog/create-question-dialog.component';
 import { UserDto } from '../dtos/user-dto.mode';
 import { QuestionDto } from '../dtos/question-dto.model';
