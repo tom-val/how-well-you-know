@@ -1,0 +1,17 @@
+
+<div class="example-container">
+  <div class="form-container">
+    <form [formGroup]="gameForm">
+      <mat-form-field class="form-field" appearance="outline">
+        <mat-label> Game name
+        </mat-label>
+        <input matInput formControlName="name" required>
+        <mat-error *ngIf="gameForm.controls.name.touched && gameForm.controls.name.invalid">
+          <span *ngIf="gameForm.controls.name.errors.required">This field is mandatory.</span>
+          <span *ngIf="gameForm.controls.name.errors.maxLength">Max 20 characters.</span>
+        </mat-error>
+      </mat-form-field>
+      <button mat-raised-button color="primary" type="button" (click)="createNewGame()">Create new game</button>
+    </form>
+  </div>
+</div>

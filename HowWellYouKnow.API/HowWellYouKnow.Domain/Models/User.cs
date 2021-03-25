@@ -13,6 +13,7 @@ namespace HowWellYouKnow.Domain.Models
         public List<Guess> Guesses { get; set; }
         public List<Guess> GuessFor { get; set; }
         public List<UserAnswerResult> AnswerResults { get; set; }
+        public List<UserAnswerResult> GuessAnswerResults { get; set; }
         public List<Answer> Answers { get; set; }
         public List<UserGameScore> GameScores { get; set; }
     }

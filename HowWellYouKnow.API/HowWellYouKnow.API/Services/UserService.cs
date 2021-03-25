@@ -1,4 +1,5 @@
 ﻿using HowWellYouKnow.API.Requests;
+using HowWellYouKnow.Domain.Dtos;
 using HowWellYouKnow.Domain.Models;
 using HowWellYouKnow.Infrastructure.Repositories;
 using System;
@@ -34,6 +35,16 @@ namespace HowWellYouKnow.API.Services
             await userRepository.SaveChanges();
 
             return user.Id;
+        }
+
+        public async Task<UserDto> GetUserName(Guid userId)
+        {
+            var user = await userRepository.GetUser(userId);
+            return new UserDto
+            {
+                Id = user.Id,
+                Name = user.Name
+            };
         }
     }
 }

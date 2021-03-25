@@ -1,0 +1,43 @@
+<div class="grid-container">
+  <mat-card class="header-grid-item">
+    <mat-card-content>
+      <div class="card-content">
+        <h3>{{gameName}}</h3>
+      </div>
+    </mat-card-content>
+  </mat-card>
+  <mat-card class="questions-grid-item">
+    <mat-card-content>
+      <div class="card-content">
+        <h4>Questions</h4>
+        <mat-list class="list">
+          <mat-list-item class="option" mat-ripple *ngFor="let question of questions">
+            {{question.name}} <span class="spacer"></span> <span *ngIf="question.multipleAnswers"><b>Multiple</b></span>
+          </mat-list-item>
+          <mat-list-item >
+            <button mat-raised-button color="primary" type="button" class="button" (click)="createNewQuestion()">New question</button>
+          </mat-list-item>
+        </mat-list>
+      </div>
+    </mat-card-content>
+  </mat-card>
+  <mat-card class="users-grid-item">
+    <mat-card-content>
+      <div class="card-content">
+        <h4>Users</h4>
+        <mat-list class="list">
+          <mat-list-item class="option" mat-ripple *ngFor="let user of joinedUsers">
+            {{user.name}}
+          </mat-list-item>
+        </mat-list>
+      </div>
+    </mat-card-content>
+  </mat-card>
+  <mat-card class="start-game-grid-item" *ngIf="questions?.length > 0">
+    <mat-card-content>
+      <div class="card-content">
+        <button mat-raised-button color="primary" type="button" class="button" (click)="startGame()">Start game</button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

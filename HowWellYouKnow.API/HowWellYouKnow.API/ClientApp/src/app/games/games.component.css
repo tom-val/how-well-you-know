@@ -1,0 +1,16 @@
+.example-container{
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+.form-container{
+  width: 400px; 
+  margin: 0px auto; 
+}
+
+.form-field{
+  display: block
+}

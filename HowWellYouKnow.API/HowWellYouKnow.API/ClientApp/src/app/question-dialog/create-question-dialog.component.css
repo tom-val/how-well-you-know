@@ -1,0 +1,27 @@
+.mat-form-field {
+    display: block;
+}
+
+.content {
+    min-width: 30vh;
+}
+
+.list {
+    min-width: 100%;
+  }
+  
+  .button {
+    width: 100%;
+  }
+
+  .option:hover { 
+    cursor: pointer;
+    background-image: initial;
+      background-position-x: initial;
+      background-position-y: initial;
+      background-size: initial;
+      background-attachment: initial;
+      background-origin: initial;
+      background-clip: initial;
+      background-color: rgba(0, 0, 0, 0.04);
+  }

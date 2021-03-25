@@ -42,26 +42,30 @@ namespace HowWellYouKnow.API.Services
             }
 
             var userAnswerResults = game.JoinedUsers.Select(u => {
-                var guess = game.GameState.CurrentQuestion.Guesses.First(x => x.UserId == u.Id);
-                var answer = game.GameState.CurrentQuestion.Answers.FirstOrDefault(x => x.UserId == guess.GuessUserId);
-
-                var allMatch = guess.QuestionVariants.Except(answer.QuestionVariants).Count() == 0;
-
-                if (allMatch)
+                var guessAnswers = game.GameState.CurrentQuestion.Guesses.Select(guess =>
                 {
-                    var gameScore = game.GameState.GameScores.FirstOrDefault(x => x.UserId == u.Id);
-                    gameScore.CurrentScore += game.GameState.CurrentQuestion.MultipleAnswers ? 2 : 1;
-                }
+                    var answer = game.GameState.CurrentQuestion.Answers.FirstOrDefault(x => x.UserId == guess.GuessUserId);
 
-                return new UserAnswerResult
-                {
-                    UserId = u.Id,
-                    QuestionId = game.GameState.CurrentQuestionId.Value,
-                    AnswerQuestionVariants = answer.QuestionVariants,
-                    GuessQuestionVariants = guess.QuestionVariants,
-                    Correct = allMatch
-                };
-            }).ToList();
+                    var allMatch = guess.QuestionVariants.Except(answer.QuestionVariants).Count() == 0;
+
+                    if (allMatch)
+                    {
+                        var gameScore = game.GameState.GameScores.FirstOrDefault(x => x.UserId == u.Id);
+                        gameScore.CurrentScore += game.GameState.CurrentQuestion.MultipleAnswers ? 2 : 1;
+                    }
+
+                    return new UserAnswerResult
+                    {
+                        UserId = u.Id,
+                        QuestionId = game.GameState.CurrentQuestionId.Value,
+                        AnswerQuestionVariants = answer.QuestionVariants,
+                        GuessQuestionVariants = guess.QuestionVariants,
+                        GuessUserId = guess.GuessUserId,
+                        Correct = allMatch
+                    };
+                });
+                return guessAnswers;
+            }).SelectMany(x => x).ToList();
 
             game.GameState.CurrentGameState = Domain.Enums.CurrentGameState.QuestionReview;
 

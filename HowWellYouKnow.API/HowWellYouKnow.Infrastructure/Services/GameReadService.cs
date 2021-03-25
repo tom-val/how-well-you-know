@@ -30,18 +30,21 @@ namespace HowWellYouKnow.Infrastructure.Services
                     GameScores = x.GameState.GameScores.Select(s => new GameScoreDto
                     {
                         UserId = s.UserId,
+                        Name = s.User.Name,
                         CurrentScore = s.CurrentScore
                     }).ToList(),
                     AnswerResults = x.GameState.CurrentQuestion.AnswerResults.Select(r => new UserAnswerResultDto
                     {
                         UserId = r.UserId,
+                        Name = r.User.Name,
                         Correct = r.Correct,
+                        GuessName = r.GuessUser.Name,
                         AnswerVariants = r.AnswerQuestionVariants.Select(v => new QuestionVariantDto
                         {
                             Name = v.Name,
                             Notation = v.Notation,
                         }).ToList(),
-                        GuessVariants = r.AnswerQuestionVariants.Select(v => new QuestionVariantDto
+                        GuessVariants = r.GuessQuestionVariants.Select(v => new QuestionVariantDto
                         {
                             Name = v.Name,
                             Notation = v.Notation,

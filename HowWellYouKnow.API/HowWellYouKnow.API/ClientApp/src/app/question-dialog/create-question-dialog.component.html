@@ -1,0 +1,26 @@
+<h2 mat-dialog-title>Create question</h2>
+
+<mat-dialog-content [formGroup]="form" class="content">
+
+    <mat-form-field>
+        <input matInput placeholder="Name" formControlName="name">
+    </mat-form-field>
+    <mat-checkbox color="primary" formControlName="multipleAnswers">Multiple answers</mat-checkbox>
+    <h4>Variants: </h4>
+    <mat-list class="list">
+        <mat-list-item class="option" mat-ripple *ngFor="let variant of variants">
+            {{variant.name}}
+        </mat-list-item>
+        <mat-list-item>
+            <input matInput placeholder="Enter variant" formControlName="variant">
+        </mat-list-item>
+        <mat-list-item>
+            <button mat-raised-button color="primary" type="button" class="button" (click)="addVariant()">Add variant</button>
+        </mat-list-item>
+    </mat-list>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+    <button class="mat-raised-button" (click)="close()" style="margin-right: 1rem;">Close</button>
+    <button class="mat-raised-button mat-primary" (click)="save()">Save</button>
+</mat-dialog-actions>

@@ -1,0 +1,17 @@
+
+<div class="example-container">
+  <div class="form-container">
+    <form [formGroup]="loginForm" (submit)="submit()">
+      <mat-form-field class="form-field" appearance="outline">
+        <mat-label> Username
+        </mat-label>
+        <input matInput formControlName="name" required>
+        <mat-error *ngIf="loginForm.controls.name.touched && loginForm.controls.name.invalid">
+          <span *ngIf="loginForm.controls.name.errors.required">This field is mandatory.</span>
+          <span *ngIf="loginForm.controls.name.errors.maxLength">Max 20 characters.</span>
+        </mat-error>
+      </mat-form-field>
+      <button mat-raised-button color="primary" type="button" (click)="loginButtonClick()">Log In</button>
+    </form>
+  </div>
+</div>

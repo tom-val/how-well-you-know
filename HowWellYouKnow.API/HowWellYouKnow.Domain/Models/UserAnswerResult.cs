@@ -12,5 +12,7 @@ namespace HowWellYouKnow.Domain.Models
         public bool Correct { get; set; }
         public User User { get; set; }
         public Guid UserId { get; set; }
+        public User GuessUser { get; set; }
+        public Guid GuessUserId { get; set; }
     }
 }

@@ -1,0 +1,82 @@
+.grid-container {
+  display: grid;
+  grid-template-areas:
+    'header header'
+    'question question'
+    'answers users';
+  grid-gap: 10px;
+  padding: 10px;
+  justify-content: center;
+  align-content: center;
+  gap: 4px;
+  grid-auto-flow: column;
+  min-height: 90vh;
+}
+
+.questions-grid-item {
+  grid-area: questions;
+  min-width: 30vh;
+  min-height: 20vh;
+}
+
+.users-grid-item {
+  grid-area: users;
+  min-width: 10vh;
+  min-height: 20vh;
+}
+
+.header-grid-item {
+  grid-area: header;
+  min-width: 40vh;
+}
+
+.question-grid-item {
+  grid-area: question;
+  min-width: 40vh;
+}
+
+.answers-grid-item {
+  grid-area: answers;
+  min-width: 40vh;
+}
+
+.users-card {
+  max-width: 400px;
+  min-width: 10vh;
+}
+
+.card-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: inherit;
+}
+
+.login-input {
+  text-align: center;
+}
+
+.list {
+  min-width: 100%;
+}
+
+.button {
+  width: 100%;
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+.option:hover { 
+  cursor: pointer;
+  background-image: initial;
+    background-position-x: initial;
+    background-position-y: initial;
+    background-size: initial;
+    background-attachment: initial;
+    background-origin: initial;
+    background-clip: initial;
+    background-color: rgba(0, 0, 0, 0.04);
+}

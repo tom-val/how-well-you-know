@@ -24,6 +24,10 @@ namespace HowWellYouKnow.Infrastructure.ModelBindings
             builder.HasOne(x => x.User)
                     .WithMany(x => x.AnswerResults)
                     .HasForeignKey(x => x.UserId);
+
+            builder.HasOne(x => x.GuessUser)
+                    .WithMany(x => x.GuessAnswerResults)
+                    .HasForeignKey(x => x.GuessUserId);
         }
     }
 }

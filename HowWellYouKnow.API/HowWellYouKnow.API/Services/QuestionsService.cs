@@ -43,10 +43,7 @@ namespace HowWellYouKnow.API.Services
             await questionRepository.SaveQuestion(question);
             await questionRepository.SaveChanges();
 
-            await hubContext.Clients.All.SendAsync(gameId.ToString(), new {
-                    question.Id,
-                    question.Name,
-            });
+            await hubContext.Clients.All.SendAsync(gameId.ToString(), request);
 
             return question.Id;
         }

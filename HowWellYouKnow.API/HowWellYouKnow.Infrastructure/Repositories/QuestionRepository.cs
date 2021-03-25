@@ -24,6 +24,8 @@ namespace HowWellYouKnow.Infrastructure.Repositories
         public Task<Question> GetQuestion(Guid questionId)
         {
             return databaseContext.Questions.Include(x => x.Variants)
+                .Include(x => x.Answers)
+                .Include(x => x.Guesses)
                 .FirstOrDefaultAsync(x => x.Id == questionId);
         }
 

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using HowWellYouKnow.API.Requests;
 using HowWellYouKnow.API.Services;
+using HowWellYouKnow.Domain.Dtos;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -23,6 +24,12 @@ namespace HowWellYouKnow.API.Controllers
         public Task<Guid> CreateGet(UserRequest request)
         {
             return userService.CreateOrReturnUser(request);
+        }
+
+        [HttpGet("{id}/name")]
+        public Task<UserDto> GetUserName([FromRoute] Guid id)
+        {
+            return userService.GetUserName(id);
         }
     }
 }

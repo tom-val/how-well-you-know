@@ -33,6 +33,11 @@ namespace HowWellYouKnow.API.Services
                 throw new ValidationException("Wrong variant count");
             }
 
+            if(question.Answers.Any(x => x.UserId == userId))
+            {
+                throw new ValidationException("Answer already saved");
+            }
+
             var questionVariants = question.Variants.Where(x => request.QuestionVariants.Contains(x.Id)).ToList();
 
             var answer = new Answer
@@ -56,6 +61,13 @@ namespace HowWellYouKnow.API.Services
             {
                 throw new ValidationException("Wrong variant count");
             }
+
+            if (question.Guesses.Any(x => x.UserId == userId && x.GuessUserId == request.GuessUser))
+            {
+                await gameStatusService.CheckIfAllAnswered(gameId);
+                throw new ValidationException("Guess already saved");
+            }
+
 
             var questionVariants = question.Variants.Where(x => request.QuestionVariants.Contains(x.Id)).ToList();
 

@@ -1,6 +1,7 @@
 ﻿using HowWellYouKnow.Domain.Enums;
 using System;
 using System.Collections.Generic;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 
 namespace HowWellYouKnow.Domain.Dtos
@@ -17,11 +18,14 @@ namespace HowWellYouKnow.Domain.Dtos
     public class GameScoreDto
     {
         public Guid UserId { get; set; }
+        public string Name { get; set; }
         public int CurrentScore { get; set; }
     }
 
     public class UserAnswerResultDto
     {
+        public string Name { get; set; }
+        public string GuessName { get; set; }
         public List<QuestionVariantDto> AnswerVariants { get; set; }
         public List<QuestionVariantDto> GuessVariants { get; set; }
         public bool Correct { get; set; }

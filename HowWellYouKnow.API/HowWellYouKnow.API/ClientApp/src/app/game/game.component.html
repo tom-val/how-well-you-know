@@ -1,0 +1,18 @@
+<app-game-setup 
+*ngIf="gameState?.currentGameState === 0"
+[gameId]="gameId" 
+[joinedUsers]="game?.joinedUsers"
+[questions]="game?.questions"
+[gameName]="game?.name"
+(questionAdded)="updateQuestions($event)">
+</app-game-setup>
+
+<app-answer-question
+*ngIf="gameState?.currentGameState === 1"
+[gameId]="gameId" 
+[joinedUsers]="game?.joinedUsers"
+[question]="getCurrentQuestion()"
+[userScores]="gameState?.gameScores"
+>
+
+</app-answer-question>
