@@ -78,6 +78,7 @@ namespace HowWellYouKnow.API
             {
                 endpoints.MapHub<QuestionsHub>("/questions");
                 endpoints.MapHub<GameStateHub>("/gameState");
+                endpoints.MapHub<UserHub>("/users");
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller}/{action=Index}/{id?}");

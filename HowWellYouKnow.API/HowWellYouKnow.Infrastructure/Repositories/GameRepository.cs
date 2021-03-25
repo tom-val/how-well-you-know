@@ -27,6 +27,7 @@ namespace HowWellYouKnow.Infrastructure.Repositories
                 .Include(x => x.JoinedUsers)
                 .Include(x => x.GameState)
                 .Include(x => x.Questions)
+                .OrderBy(x => x.Name)
                 .FirstOrDefaultAsync(x => x.Id == gameId);
         }
 

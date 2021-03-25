@@ -22,6 +22,7 @@ namespace HowWellYouKnow.API.Services
             this.hubContext = hubContext;
             this.gameRepository = gameRepository;
             this.answerResultRepository = answerResultRepository;
+            this.hubContext = hubContext;
         }
 
         public async Task BroadcastGameState(Guid gameId)
@@ -42,11 +43,14 @@ namespace HowWellYouKnow.API.Services
             }
 
             var userAnswerResults = game.JoinedUsers.Select(u => {
-                var guessAnswers = game.GameState.CurrentQuestion.Guesses.Select(guess =>
+                var guessAnswers = game.GameState.CurrentQuestion.Guesses.Where(g => g.GuessUserId != u.Id).Select(guess =>
                 {
                     var answer = game.GameState.CurrentQuestion.Answers.FirstOrDefault(x => x.UserId == guess.GuessUserId);
 
-                    var allMatch = guess.QuestionVariants.Except(answer.QuestionVariants).Count() == 0;
+                    var answerString = string.Join(";", answer.QuestionVariants.OrderBy(x => x.Id).Select(x => x.Name));
+                    var guessString = string.Join(";", guess.QuestionVariants.OrderBy(x => x.Id).Select(x => x.Name));
+
+                    var allMatch = guessString == answerString;
 
                     if (allMatch)
                     {

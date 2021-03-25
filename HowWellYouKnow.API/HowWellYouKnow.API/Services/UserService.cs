@@ -1,7 +1,9 @@
-﻿using HowWellYouKnow.API.Requests;
+﻿using HowWellYouKnow.API.Hubs;
+using HowWellYouKnow.API.Requests;
 using HowWellYouKnow.Domain.Dtos;
 using HowWellYouKnow.Domain.Models;
 using HowWellYouKnow.Infrastructure.Repositories;
+using Microsoft.AspNetCore.SignalR;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -59,8 +59,14 @@
   min-height: inherit;
 }
 
-.login-input {
-  text-align: center;
+.inner-card {
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+.inner-card-content {
+  display: flex;
+  flex-direction: column;
 }
 
 .list {

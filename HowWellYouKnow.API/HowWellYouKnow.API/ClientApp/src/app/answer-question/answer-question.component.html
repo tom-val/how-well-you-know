@@ -1,8 +1,8 @@
-<div class="grid-container">
+<div class="grid-container" *ngIf="!guessingDone">
   <mat-card class="header-grid-item">
     <mat-card-content>
       <div class="card-content">
-        <h4>How would you answer question?</h4>
+        <h4>{{guessing ? 'How ' + guessingUser.name + ' would answer question?' : 'How would you answer question?'}}</h4>
       </div>
     </mat-card-content>
   </mat-card>
@@ -16,21 +16,14 @@
   <mat-card class="answers-grid-item">
     <mat-card-content>
       <div class="card-content">
-        <h4>Possible answers <b>{{question.multipleAnswers ? 'Multiple' : ''}}</b></h4>
+        <h4>Possible answers <b>{{question.multipleAnswers ? '(Multiple)' : ''}}</b></h4>
         <mat-list class="list">
-          <mat-selection-list #shoes>
-            <mat-list-option *ngFor="let variant of question.variants">
+          <mat-selection-list #variants [multiple]="question.multipleAnswers" [(ngModel)]="selectedVariants">
+            <mat-list-option *ngFor="let variant of question.variants" [value]="variant.id">
               {{variant.name}}
             </mat-list-option>
           </mat-selection-list>
         </mat-list>
-        <!-- <mat-list role="list">
-          <mat-list-item role="listitem" *ngFor="let variant of question.variants; let i = index">
-            <mat-radio-button [value]="i" (change)="selection = $event.value">
-              {{variant.name}}
-            </mat-radio-button>
-          </mat-list-item>
-        </mat-list> -->
       </div>
     </mat-card-content>
   </mat-card>
@@ -43,6 +36,23 @@
             {{user.name}} ({{user.currentScore}})
           </mat-list-item>
         </mat-list>
+      </div>
+    </mat-card-content>
+  </mat-card>
+  <mat-card class="answer-game-grid-item" style="grid-column: 1 / -1;" *ngIf="selectedVariants?.length > 0">
+    <mat-card-content>
+      <div class="card-content">
+        <button *ngIf="!guessing" mat-raised-button color="primary" type="button" class="button" (click)="answerQuestion()">Answer</button>
+        <button *ngIf="guessing" mat-raised-button color="primary" type="button" class="button" (click)="guessAnswer()">Guess</button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>
+<div class="grid-container" *ngIf="guessingDone">
+  <mat-card class="header-grid-item">
+    <mat-card-content>
+      <div class="card-content">
+        <h4>Wait for others to finish voting</h4>
       </div>
     </mat-card-content>
   </mat-card>

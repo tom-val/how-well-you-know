@@ -1,5 +1,6 @@
 ﻿using HowWellYouKnow.API.Hubs;
 using HowWellYouKnow.API.Requests;
+using HowWellYouKnow.Domain.Dtos;
 using HowWellYouKnow.Domain.Models;
 using HowWellYouKnow.Infrastructure.Repositories;
 using Microsoft.AspNetCore.SignalR;
@@ -43,7 +44,17 @@ namespace HowWellYouKnow.API.Services
             await questionRepository.SaveQuestion(question);
             await questionRepository.SaveChanges();
 
-            await hubContext.Clients.All.SendAsync(gameId.ToString(), request);
+            await hubContext.Clients.All.SendAsync(gameId.ToString(), new QuestionDto {
+                Id = question.Id,
+                Name = question.Name,
+                MultipleAnswers = question.MultipleAnswers,
+                Variants = question.Variants.Select(v => new QuestionVariantDto
+                {
+                    Id = v.Id,
+                    Name = v.Name,
+                    Notation = v.Notation
+                }).ToList()
+            });
 
             return question.Id;
         }

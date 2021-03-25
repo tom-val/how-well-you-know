@@ -23,8 +23,11 @@ export class GameSetupComponent implements OnInit {
   }
 
   ngOnInit(): void {
-     this.startConnection();
+     this.startQuestionsConnection();
      this.addQuestionsListener();
+
+     this.startUsersConnection();
+     this.addUsersListener();
   }
 
   @Input() gameId: string;
@@ -33,8 +36,9 @@ export class GameSetupComponent implements OnInit {
   @Input() questions: QuestionDto[];
 
   @Output() questionAdded = new EventEmitter<QuestionDto>();
+  @Output() userAdded = new EventEmitter<UserDto>();
 
-  public startConnection = () => {
+  public startQuestionsConnection = () => {
     this.hubConnection = new signalR.HubConnectionBuilder()
       .withUrl(this.baseUrl + 'questions')
       .build();
@@ -48,6 +52,23 @@ export class GameSetupComponent implements OnInit {
     this.hubConnection.on(this.gameId, (data: QuestionDto) => {
       console.log(data);
       this.questionAdded.emit(data);
+    });
+  }
+
+  public startUsersConnection = () => {
+    this.hubConnection = new signalR.HubConnectionBuilder()
+      .withUrl(this.baseUrl + 'users')
+      .build();
+    this.hubConnection
+      .start()
+      .then(() => console.log('Connection started'))
+      .catch(err => console.log('Error while starting connection: ' + err));
+  }
+
+  public addUsersListener = () => {
+    this.hubConnection.on(this.gameId, (data: UserDto) => {
+      console.log(data);
+      this.userAdded.emit(data);
     });
   }
 

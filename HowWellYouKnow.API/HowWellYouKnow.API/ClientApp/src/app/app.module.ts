@@ -60,6 +60,8 @@ import { GameComponent } from './game/game.component';
 import { CreateQuestionDialogComponent } from './question-dialog/create-question-dialog.component';
 import { GameSetupComponent } from './game-setup/game-setup.component';
 import { AnswerQuestionComponent } from './answer-question/answer-question.component';
+import { ReviewQuestionComponent } from './review-question/review-question.component';
+import { ReviewGameComponent } from './review-game/review-game.component';
 
 @NgModule({
   declarations: [
@@ -72,7 +74,9 @@ import { AnswerQuestionComponent } from './answer-question/answer-question.compo
     GameComponent,
     CreateQuestionDialogComponent,
     GameSetupComponent,
-    AnswerQuestionComponent
+    AnswerQuestionComponent,
+    ReviewQuestionComponent,
+    ReviewGameComponent
   ],
   imports: [
     ReactiveFormsModule,

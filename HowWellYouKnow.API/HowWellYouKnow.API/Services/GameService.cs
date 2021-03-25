@@ -1,9 +1,11 @@
-﻿using HowWellYouKnow.API.Requests;
+﻿using HowWellYouKnow.API.Hubs;
+using HowWellYouKnow.API.Requests;
 using HowWellYouKnow.Domain.Dtos;
 using HowWellYouKnow.Domain.Enums;
 using HowWellYouKnow.Domain.Models;
 using HowWellYouKnow.Infrastructure.Repositories;
 using HowWellYouKnow.Infrastructure.Services;
+using Microsoft.AspNetCore.SignalR;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -18,12 +20,14 @@ namespace HowWellYouKnow.API.Services
         private GameReadService gameReadService;
         private UserRepository userRepository;
         private GameStatusService gameStatusService;
-        public GameService(GameRepository gameRepository, GameReadService gameReadService, UserRepository userRepository, GameStatusService gameStatusService)
+        private readonly IHubContext<UserHub> hubContext;
+        public GameService(GameRepository gameRepository, GameReadService gameReadService, UserRepository userRepository, GameStatusService gameStatusService, IHubContext<UserHub> hubContext)
         {
             this.gameRepository = gameRepository;
             this.gameReadService = gameReadService;
             this.userRepository = userRepository;
             this.gameStatusService = gameStatusService;
+            this.hubContext = hubContext;
         }
 
         public async Task<Guid> CreateNewGame(CreateGameRequest request, Guid userId)
@@ -58,6 +62,7 @@ namespace HowWellYouKnow.API.Services
 
                 game.JoinedUsers.Add(user);
                 await gameRepository.SaveChanges();
+                await hubContext.Clients.All.SendAsync(gameId.ToString(), new { user.Id, user.Name });
             }
 
             return await gameReadService.GetGame(gameId);
@@ -104,6 +109,11 @@ namespace HowWellYouKnow.API.Services
 
             game.GameState.CurrentGameState = CurrentGameState.AnsweringQuestion;
             game.GameState.CurrentQuestion = game.Questions.OrderBy(x => x.Name).SkipWhile(item => item.Id != game.GameState.CurrentQuestionId).Skip(1).FirstOrDefault();
+
+            if(game.GameState.CurrentQuestion == null)
+            {
+                game.GameState.CurrentGameState = CurrentGameState.GameReview;
+            }
 
             await gameRepository.SaveChanges();
 

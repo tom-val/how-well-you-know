@@ -6,6 +6,7 @@ export interface GameStateDto {
     currentGameState: CurrentGameState;
     currentQuestion: string;
     gameScores: GameScoreDto[];
+    answerResults: UserAnswerResultDto[];
 }
 
 export interface GameScoreDto {

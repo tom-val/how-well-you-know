@@ -6,6 +6,7 @@ import { GameDto } from '../dtos/game-dto.models';
 import { QuestionDto } from '../dtos/question-dto.model';
 import { GameStateDto } from '../dtos/game-state-dto.model';
 import * as signalR from '@microsoft/signalr';
+import { UserDto } from '../dtos/user-dto.mode';
 
 @Component({
   selector: 'app-game',
@@ -24,6 +25,7 @@ export class GameComponent {
     gameId: string;
     game: GameDto;
     gameState: GameStateDto;
+    lastQuestionId: string;
 
     public startConnection = () => {
       this.hubConnection = new signalR.HubConnectionBuilder()
@@ -48,7 +50,8 @@ export class GameComponent {
     this.addGameStateListener();
 
     this.http.get<GameDto>(this.baseUrl + 'api/game/' + this.gameId).subscribe(result => {
-      this.game = result;
+      this.game = result;   
+      this.setLastQuestion();
     }, error => this._snackBar.open(JSON.stringify(error.message)));
 
     this.http.get<GameStateDto>(this.baseUrl + 'api/game/' + this.gameId + '/state').subscribe(result => {
@@ -56,11 +59,26 @@ export class GameComponent {
     }, error => this._snackBar.open(JSON.stringify(error.message)));
   }
 
+  setLastQuestion() {
+    if (this.game.questions.length > 0) {
+      this.game.questions = this.game.questions.sort((one, two) => (one.name > two.name ? 1 : -1));
+      this.lastQuestionId = this.game.questions[this.game.questions.length - 1].id;
+    } 
+  }
+
   updateQuestions(question: QuestionDto ) {
     this.game.questions.push(question);
+    this.setLastQuestion();
+  }
+
+  updateUsers(user: UserDto ) {
+    this.game.joinedUsers.push(user);
   }
 
   getCurrentQuestion(): QuestionDto {
+    if(!this.game) {
+      return {} as QuestionDto;
+    }
     return this.game.questions.find(x => x.id === this.gameState.currentQuestion);
   }
 

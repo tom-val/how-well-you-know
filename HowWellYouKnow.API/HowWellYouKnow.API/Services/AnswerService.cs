@@ -64,7 +64,6 @@ namespace HowWellYouKnow.API.Services
 
             if (question.Guesses.Any(x => x.UserId == userId && x.GuessUserId == request.GuessUser))
             {
-                await gameStatusService.CheckIfAllAnswered(gameId);
                 throw new ValidationException("Guess already saved");
             }
 
