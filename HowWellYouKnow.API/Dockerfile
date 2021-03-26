@@ -21,6 +21,10 @@ RUN apt-get update && \
 FROM build AS publish
 RUN dotnet publish "HowWellYouKnow.API.csproj" -c Release -o /app/publish
 
+FROM base AS permissions
+WORKDIR /app
+RUN chmod -R a+rwX questions.db
+
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
