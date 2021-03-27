@@ -27,6 +27,7 @@ namespace HowWellYouKnow.Infrastructure.Services
                     GameId = x.Id,
                     CurrentGameState = x.GameState.CurrentGameState,
                     CurrentQuestion = x.GameState.CurrentQuestionId,
+                    LastQuestionId = x.LastQuestionId,
                     GameScores = x.GameState.GameScores.Select(s => new GameScoreDto
                     {
                         UserId = s.UserId,
@@ -43,12 +44,12 @@ namespace HowWellYouKnow.Infrastructure.Services
                         {
                             Name = v.Name,
                             Notation = v.Notation,
-                        }).ToList(),
+                        }).OrderBy(x => x.Notation).ToList(),
                         GuessVariants = r.GuessQuestionVariants.Select(v => new QuestionVariantDto
                         {
                             Name = v.Name,
                             Notation = v.Notation,
-                        }).ToList(),
+                        }).OrderBy(x => x.Notation).ToList(),
                     }).ToList()
                 }).FirstOrDefaultAsync();
         }
@@ -62,6 +63,7 @@ namespace HowWellYouKnow.Infrastructure.Services
                {
                    GameId = x.Id,
                    Name = x.Name,
+                   LastQuestionId = x.LastQuestionId,
                    JoinedUsers = x.JoinedUsers.Select(u => new UserDto
                    {
                        Id = u.Id,
@@ -71,14 +73,15 @@ namespace HowWellYouKnow.Infrastructure.Services
                    {
                        Id = q.Id,
                        Name = q.Name,
+                       Order = q.Order,
                        MultipleAnswers = q.MultipleAnswers,
                        Variants = q.Variants.Select(v => new QuestionVariantDto
                        {
                            Id = v.Id,
                            Name = v.Name,
                            Notation = v.Notation,
-                       }).ToList()
-                   }).ToList()
+                       }).OrderBy(x => x.Notation).ToList()
+                   }).OrderBy(x => x.Order).ToList()
                }).FirstOrDefaultAsync();
         }
 

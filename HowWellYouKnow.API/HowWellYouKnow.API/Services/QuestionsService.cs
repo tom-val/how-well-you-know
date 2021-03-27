@@ -15,11 +15,13 @@ namespace HowWellYouKnow.API.Services
     public class QuestionsService
     {
         private QuestionRepository questionRepository;
+        private GameRepository gameRepository;
         private readonly IHubContext<QuestionsHub> hubContext;
-        public QuestionsService(QuestionRepository questionRepository, IHubContext<QuestionsHub> hubContext)
+        public QuestionsService(GameRepository gameRepository, QuestionRepository questionRepository, IHubContext<QuestionsHub> hubContext)
         {
             this.questionRepository = questionRepository;
             this.hubContext = hubContext;
+            this.gameRepository = gameRepository;
         }
 
         public async Task<Guid> CreateQuestion(CreateQuestionRequest request, Guid gameId, Guid userId)
@@ -30,31 +32,40 @@ namespace HowWellYouKnow.API.Services
                 throw new ValidationException("Invalid number of varitants");
             }
 
-            var question = new Question {
-               Name = request.Name,
-               MultipleAnswers = request.MultipleAnswers,
-               GameId = gameId,
-               Variants = request.Variants.Select(v => new QuestionVariant
+            var game = await gameRepository.GetGameWithQuestions(gameId);
+
+            var question = new Question
+            {
+                Name = request.Name,
+                MultipleAnswers = request.MultipleAnswers,
+                GameId = gameId,
+                Order = game.Questions.Count + 1,
+                Variants = request.Variants.Select(v => new QuestionVariant
                 {
                     Name = v.Name,
                     Notation = v.Notation,
                 }).ToList()
             };
 
-            await questionRepository.SaveQuestion(question);
+            game.Questions.Add(question);
+            game.LastQuestion = question;
+
             await questionRepository.SaveChanges();
 
-            await hubContext.Clients.All.SendAsync(gameId.ToString(), new QuestionDto {
+            await hubContext.Clients.All.SendAsync(gameId.ToString(), new QuestionDto
+            {
                 Id = question.Id,
                 Name = question.Name,
+                Order = question.Order,
                 MultipleAnswers = question.MultipleAnswers,
                 Variants = question.Variants.Select(v => new QuestionVariantDto
                 {
                     Id = v.Id,
                     Name = v.Name,
                     Notation = v.Notation
-                }).ToList()
+                }).OrderBy(x => x.Notation).ToList()
             });
+
 
             return question.Id;
         }

@@ -24,7 +24,7 @@
 [question]="getCurrentQuestion()"
 [userScores]="gameState?.gameScores"
 [answerResults]="gameState?.answerResults"
-[lastQuestion]="lastQuestionId === gameState?.currentQuestion"
+[lastQuestion]="gameState?.lastQuestionId === gameState?.currentQuestion"
 ></app-review-question>
 
 <app-review-game

@@ -25,7 +25,6 @@ export class GameComponent {
     gameId: string;
     game: GameDto;
     gameState: GameStateDto;
-    lastQuestionId: string;
 
     public startConnection = () => {
       this.hubConnection = new signalR.HubConnectionBuilder()
@@ -51,7 +50,6 @@ export class GameComponent {
 
     this.http.get<GameDto>(this.baseUrl + 'api/game/' + this.gameId).subscribe(result => {
       this.game = result;   
-      this.setLastQuestion();
     }, error => this._snackBar.open(JSON.stringify(error.message)));
 
     this.http.get<GameStateDto>(this.baseUrl + 'api/game/' + this.gameId + '/state').subscribe(result => {
@@ -59,16 +57,10 @@ export class GameComponent {
     }, error => this._snackBar.open(JSON.stringify(error.message)));
   }
 
-  setLastQuestion() {
-    if (this.game.questions.length > 0) {
-      this.game.questions = this.game.questions.sort((one, two) => (one.name > two.name ? 1 : -1));
-      this.lastQuestionId = this.game.questions[this.game.questions.length - 1].id;
-    } 
-  }
 
   updateQuestions(question: QuestionDto ) {
     this.game.questions.push(question);
-    this.setLastQuestion();
+    this.game.questions = this.game.questions.sort(x => x.order);
   }
 
   updateUsers(user: UserDto ) {

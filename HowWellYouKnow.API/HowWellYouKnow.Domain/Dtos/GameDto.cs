@@ -8,6 +8,7 @@ namespace HowWellYouKnow.Domain.Dtos
     {
         public Guid GameId { get; set; }
         public string Name { get; set; }
+        public Guid? LastQuestionId { get; set; }
         public List<UserDto> JoinedUsers { get; set; }
         public List<QuestionDto> Questions { get; set; }
     }
@@ -16,6 +17,7 @@ namespace HowWellYouKnow.Domain.Dtos
     {
         public Guid Id { get; set; }
         public string Name { get; set; }
+        public int Order { get; set; }
         public bool MultipleAnswers { get; set; }
         public List<QuestionVariantDto> Variants { get; set; }
     }

@@ -11,6 +11,7 @@ namespace HowWellYouKnow.Domain.Dtos
         public Guid GameId { get; set; }
         public CurrentGameState CurrentGameState { get; set; }
         public Guid? CurrentQuestion { get; set; }
+        public Guid? LastQuestionId { get; set; }
         public List<GameScoreDto> GameScores { get; set; }
         public List<UserAnswerResultDto> AnswerResults { get; set; }
     }

@@ -3,14 +3,16 @@ using System;
 using HowWellYouKnow.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace HowWellYouKnow.Infrastructure.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    partial class DatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20210327075440_CountQuestions")]
+    partial class CountQuestions
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -94,7 +96,7 @@ namespace HowWellYouKnow.Infrastructure.Migrations
                     b.Property<Guid>("GameStateId")
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid?>("LastQuestionId")
+                    b.Property<Guid>("LastQuestionId")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
@@ -400,7 +402,9 @@ namespace HowWellYouKnow.Infrastructure.Migrations
 
                     b.HasOne("HowWellYouKnow.Domain.Models.Question", "LastQuestion")
                         .WithOne("LastQuestionGame")
-                        .HasForeignKey("HowWellYouKnow.Domain.Models.Game", "LastQuestionId");
+                        .HasForeignKey("HowWellYouKnow.Domain.Models.Game", "LastQuestionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("CreatedBy");
 

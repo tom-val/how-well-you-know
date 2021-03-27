@@ -83,7 +83,7 @@ namespace HowWellYouKnow.API.Services
             }
 
             game.GameState.CurrentGameState = CurrentGameState.AnsweringQuestion;
-            game.GameState.CurrentQuestion = game.Questions.OrderBy(x => x.Name).First();
+            game.GameState.CurrentQuestion = game.Questions.OrderBy(x => x.Order).First();
             game.GameState.GameScores = game.JoinedUsers.Select(u => new UserGameScore
             {
                 UserId = u.Id,
@@ -108,7 +108,7 @@ namespace HowWellYouKnow.API.Services
 
 
             game.GameState.CurrentGameState = CurrentGameState.AnsweringQuestion;
-            game.GameState.CurrentQuestion = game.Questions.OrderBy(x => x.Name).SkipWhile(item => item.Id != game.GameState.CurrentQuestionId).Skip(1).FirstOrDefault();
+            game.GameState.CurrentQuestion = game.Questions.OrderBy(x => x.Order).SkipWhile(item => item.Id != game.GameState.CurrentQuestionId).Skip(1).FirstOrDefault();
 
             if(game.GameState.CurrentQuestion == null)
             {

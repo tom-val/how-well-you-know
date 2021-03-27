@@ -6,4 +6,5 @@ export interface GameDto {
     name: string;
     joinedUsers: UserDto[];
     questions: QuestionDto[];
+    lastQuestionId: string;
 }

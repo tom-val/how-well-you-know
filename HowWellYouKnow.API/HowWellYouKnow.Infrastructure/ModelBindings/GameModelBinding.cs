@@ -30,6 +30,10 @@ namespace HowWellYouKnow.Infrastructure.ModelBindings
 
             builder.HasMany(x => x.JoinedUsers)
                  .WithMany(x => x.JoinedGames);
+
+            builder.HasOne(x => x.LastQuestion)
+                    .WithOne(x => x.LastQuestionGame)
+                    .HasForeignKey<Game>(x => x.LastQuestionId);
         }
     }
 }

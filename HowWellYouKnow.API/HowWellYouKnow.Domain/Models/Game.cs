@@ -13,5 +13,7 @@ namespace HowWellYouKnow.Domain.Models
         public Guid GameStateId { get; set; }
         public GameState GameState { get; set; }
         public List<User> JoinedUsers { get; set; }
+        public Question LastQuestion { get; set; }
+        public Guid? LastQuestionId { get; set; }
     }
 }
