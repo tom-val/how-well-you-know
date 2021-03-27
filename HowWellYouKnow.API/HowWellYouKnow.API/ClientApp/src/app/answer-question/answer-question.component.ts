@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Inject, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Inject, Input, OnInit, Output, ViewEncapsulation } from '@angular/core';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { CreateQuestionDialogComponent } from '../question-dialog/create-question-dialog.component';
 import { UserDto } from '../dtos/user-dto.mode';
@@ -14,7 +14,8 @@ import { CookieService } from 'ngx-cookie';
 @Component({
   selector: 'app-answer-question',
   templateUrl: './answer-question.component.html',
-  styleUrls: ['./answer-question.component.css']
+  styleUrls: ['./answer-question.component.css'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class AnswerQuestionComponent implements OnInit {
   constructor(
@@ -28,11 +29,13 @@ export class AnswerQuestionComponent implements OnInit {
   @Input() joinedUsers: UserDto[];
   @Input() question: QuestionDto;
   @Input() userScores: GameScoreDto[];
+  @Input() questionsCount: GameScoreDto[];
 
-  selectedVariants: string[];
+  selectedVariants = new Array<string>();
+  selectedVariant: string;
   guessing: boolean;
   guessUsers: UserDto[];
-  guessedUsers =  new Array<string>();
+  guessedUsers = new Array<string>();
   guessingDone: boolean;
   guessingUser: UserDto;
 
@@ -45,7 +48,7 @@ export class AnswerQuestionComponent implements OnInit {
   answerQuestion() {
     const questionRequest = {
       questionId: this.question.id,
-      questionVariants: this.selectedVariants
+      questionVariants: this.question.multipleAnswers ? this.selectedVariants : [this.selectedVariant]
     }
     this.http.post<string>(this.baseUrl + 'api/game/' + this.gameId + '/answer/answer', questionRequest).subscribe(result => {
       console.log(result);
@@ -53,6 +56,7 @@ export class AnswerQuestionComponent implements OnInit {
 
     this.guessing = true;
     this.selectedVariants = [];
+    this.selectedVariant = null;
     this.nextGuessUser();
   }
 
@@ -71,7 +75,7 @@ export class AnswerQuestionComponent implements OnInit {
     const guessRequest = {
       questionId: this.question.id,
       guessUser: this.guessingUser.id,
-      questionVariants: this.selectedVariants
+      questionVariants: this.question.multipleAnswers ? this.selectedVariants : [this.selectedVariant]
     }
     this.http.post<string>(this.baseUrl + 'api/game/' + this.gameId + '/answer/guess', guessRequest).subscribe(result => {
       console.log(result);
@@ -79,6 +83,7 @@ export class AnswerQuestionComponent implements OnInit {
 
     this.guessedUsers.push(this.guessingUser.id);
     this.selectedVariants = [];
+    this.selectedVariant = null;
     this.nextGuessUser();
   }
 }
