@@ -38,6 +38,8 @@ export class GameSetupComponent implements OnInit {
   @Output() questionAdded = new EventEmitter<QuestionDto>();
   @Output() userAdded = new EventEmitter<UserDto>();
 
+  displayedColumns: string[] = ['question', 'edit'];
+
   public startQuestionsConnection = () => {
     this.hubConnection = new signalR.HubConnectionBuilder()
       .withUrl(this.baseUrl + 'questions')

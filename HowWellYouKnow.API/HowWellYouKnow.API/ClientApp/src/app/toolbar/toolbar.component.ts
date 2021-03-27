@@ -19,6 +19,20 @@ export class ToolbarComponent {
 
   }
 
+  ngOnInit() {
+    if (this.cookieService.hasKey('userId')) {
+      this.setUserName();
+    }
+    this.loginService.loggedInUser$.subscribe(item => {
+      if (item) {
+        this.setUserName();
+      }
+      else {
+        this.userName = '';
+      }
+    });
+  }
+
   setUserName() {
     const userId = this.cookieService.get('userId');
     this.http.get<UserDto>(this.baseUrl + 'api/user/' + userId +'/name').subscribe(result => {
@@ -26,11 +40,12 @@ export class ToolbarComponent {
     });
   }
 
-  ngOnInit() {
-    if (this.cookieService.hasKey('userId') && this.userName === '') {
-      this.setUserName();
-    }
-    this.loginService.loggedInUser$.subscribe(item => this.setUserName());
+  showLogout(): boolean {
+    return this.cookieService.hasKey('userId');
+  }
+
+  logoutButtonClick() {
+    this.loginService.logOut();
   }
 
 }

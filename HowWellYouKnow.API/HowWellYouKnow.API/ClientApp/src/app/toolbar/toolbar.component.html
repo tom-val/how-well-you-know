@@ -5,7 +5,7 @@
   <span>How Well You Know</span>
   <span class="spacer"></span>
   {{userName}}
-  <button mat-icon-button routerLink="/" routerLinkActive="active">
+  <button mat-icon-button (click)="logoutButtonClick()" *ngIf="showLogout()">
     <mat-icon>logout</mat-icon>
   </button>
 </mat-toolbar>

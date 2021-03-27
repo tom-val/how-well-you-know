@@ -37,13 +37,13 @@ namespace HowWellYouKnow.API.Services
 
             var gameUsers = game.JoinedUsers.Count();
 
-            if (gameUsers != game.GameState.CurrentQuestion.Guesses.Count)
+            if (gameUsers * (gameUsers - 1) != game.GameState.CurrentQuestion.Guesses.Count)
             {
                 return;
             }
 
             var userAnswerResults = game.JoinedUsers.Select(u => {
-                var guessAnswers = game.GameState.CurrentQuestion.Guesses.Where(g => g.GuessUserId != u.Id).Select(guess =>
+                var guessAnswers = game.GameState.CurrentQuestion.Guesses.Where(g => g.GuessUserId != u.Id && g.UserId == u.Id).Select(guess =>
                 {
                     var answer = game.GameState.CurrentQuestion.Answers.FirstOrDefault(x => x.UserId == guess.GuessUserId);
 

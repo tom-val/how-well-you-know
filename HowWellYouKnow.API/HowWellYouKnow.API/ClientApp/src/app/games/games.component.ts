@@ -38,7 +38,7 @@ export class GamesComponent {
 
   ngOnInit() {
     this.gameForm = this.formBuilder.group({
-      name: new FormControl('', [Validators.required, Validators.maxLength(20)])
+      name: new FormControl('', [Validators.required, Validators.maxLength(50)])
     });
   }
 
