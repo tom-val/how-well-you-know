@@ -2,60 +2,82 @@
   display: grid;
   grid-template-areas:
     'header header'
-    'question question'
-    'answers users'
-    'answer answer';
-  grid-gap: 10px;
-  padding: 10px;
+    'answers answers';
+  grid-gap: 20px;
   justify-content: center;
   align-content: center;
-  gap: 4px;
+  gap: 20px;
   grid-auto-flow: column;
   min-height: 90vh;
 }
 
-.questions-grid-item {
-  grid-area: questions;
-  min-width: 30vh;
-  min-height: 20vh;
-}
-
-.users-grid-item {
-  grid-area: users;
-  min-width: 10vh;
-  min-height: 20vh;
-}
-
 .header-grid-item {
   grid-area: header;
-  min-width: 40vh;
-}
-
-.answer-grid-item {
-  grid-area: answer;
-  min-width: 40vh;
-}
-
-.question-grid-item {
-  grid-area: question;
-  min-width: 40vh;
+  min-width: 60vh;
 }
 
 .answers-grid-item {
   grid-area: answers;
-  min-width: 40vh;
+  min-width: 60vh;
 }
 
-.users-card {
-  max-width: 400px;
-  min-width: 10vh;
+.teal-text {
+  color: #009688;
+}
+
+
+.button {
+  height: 54px;
+  line-height: 54px;
+  background-color: #26a69a!important;
+  padding:  0 2rem;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 300;
+}
+
+.questions-grid-container {
+  display: grid;
+  grid-template-areas:
+    'questions users'
+    'start start';
+  grid-gap: 5px;
+  grid-auto-flow: row;
+}
+
+.questions-grid-container-questions {
+  min-width: 45vh;
+  grid-area: questions;
+}
+
+.questions-grid-container-users {
+  min-width: 15vh;
+  grid-area: users;
+  padding-left: 2vh;
+}
+
+.questions-grid-container-start {
+  grid-area: start;
+}
+
+.start {
+  display: flex;
+  justify-content: center;
 }
 
 .card-content {
   display: flex;
   flex-direction: column;
+  min-height: inherit;
+}
+
+.header-card-content {
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   min-height: inherit;
 }
 
@@ -69,26 +91,10 @@
   flex-direction: column;
 }
 
-.list {
-  min-width: 100%;
+.green-text {
+  color: green;
 }
 
-.button {
-  width: 100%;
-}
-
-.spacer {
-  flex: 1 1 auto;
-}
-
-.option:hover { 
-  cursor: pointer;
-  background-image: initial;
-    background-position-x: initial;
-    background-position-y: initial;
-    background-size: initial;
-    background-attachment: initial;
-    background-origin: initial;
-    background-clip: initial;
-    background-color: rgba(0, 0, 0, 0.04);
+.red-text {
+  color: red;
 }

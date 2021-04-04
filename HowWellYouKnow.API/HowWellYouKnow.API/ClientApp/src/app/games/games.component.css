@@ -1,6 +1,6 @@
 .form-container{
-  width: 400px; 
-  margin: 0px auto; 
+  width: 400px;
+  margin: 0px auto;
 }
 
 .form-field{
@@ -30,9 +30,7 @@
   justify-content: center;
 }
 
-.button {
-  height: 54px;
-  line-height: 54px;
+.new-game-button {
   background-color: #26a69a!important;
   padding:  0 2rem;
 }

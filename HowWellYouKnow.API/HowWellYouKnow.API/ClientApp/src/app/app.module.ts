@@ -62,6 +62,8 @@ import { GameSetupComponent } from './game-setup/game-setup.component';
 import { AnswerQuestionComponent } from './answer-question/answer-question.component';
 import { ReviewQuestionComponent } from './review-question/review-question.component';
 import { ReviewGameComponent } from './review-game/review-game.component';
+import { ErrorService } from 'src/services/error.service';
+import { SignalrService } from 'src/services/signalr.service';
 
 @NgModule({
   declarations: [
@@ -137,6 +139,8 @@ import { ReviewGameComponent } from './review-game/review-game.component';
   providers: [
     AuthGuardService,
     LoginService,
+    ErrorService,
+    SignalrService,
     {
     provide: HTTP_INTERCEPTORS,
     useClass: AddHeaderInterceptor,

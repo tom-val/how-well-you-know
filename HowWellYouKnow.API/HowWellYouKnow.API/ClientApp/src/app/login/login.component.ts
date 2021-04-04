@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import * as signalR from '@microsoft/signalr';
 import { HttpClient } from '@angular/common/http';
@@ -12,7 +12,9 @@ import { LoginService } from 'src/services/login.service';
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
+  loginForm: FormGroup;
+
   constructor(
     private http: HttpClient,
     @Inject('BASE_URL') private baseUrl: string,
@@ -23,8 +25,6 @@ export class LoginComponent {
     private router: Router) {
   }
 
-  loginForm: FormGroup;
-
   loginButtonClick() {
     if (!this.loginForm.valid) {
       return;
@@ -32,7 +32,7 @@ export class LoginComponent {
 
       this.http.post<string>(this.baseUrl + 'api/user', this.loginForm.value).subscribe(result => {
         this.cookieService.put('userId', result);
-        
+
         this._snackBar.open('Login successfull', null, {
           duration: 5000,
         });

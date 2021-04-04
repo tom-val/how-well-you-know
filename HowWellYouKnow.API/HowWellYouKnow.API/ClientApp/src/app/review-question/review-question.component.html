@@ -1,51 +1,41 @@
 <div class="grid-container">
   <mat-card class="header-grid-item">
     <mat-card-content>
-      <div class="card-content">
-        <h4>Answer review</h4>
-      </div>
-    </mat-card-content>
-  </mat-card>
-  <mat-card class="question-grid-item">
-    <mat-card-content>
-      <div class="card-content">
-        <h3>{{question.name}}</h3>
+      <div class="header-card-content">
+        <span class="teal-text title">Question Review</span>
       </div>
     </mat-card-content>
   </mat-card>
   <mat-card class="answers-grid-item">
     <mat-card-content>
-      <div class="card-content">
-        <mat-card *ngFor="let result of answerResults" class="inner-card">
-          <mat-card-header>
-            <mat-card-title>{{result.name}} guess for {{result.guessName}}</mat-card-title>
-          </mat-card-header>
-          <mat-card-content class="inner-card-content">
-              <span>{{result.name}} guess: <b>{{getList(result.guessVariants)}}</b></span>
-              <span>{{result.guessName}} answer: <b>{{getList(result.answerVariants)}}</b></span>
-              <span>{{result.name}} guess is <b>{{result.correct ? 'Correct' : 'Incorrect'}}</b></span>
-          </mat-card-content>
-        </mat-card>
-      </div>
-    </mat-card-content>
-  </mat-card>
-  <mat-card class="users-grid-item">
-    <mat-card-content>
-      <div class="card-content">
-        <h4>Scores</h4>
-        <mat-list class="list">
-          <mat-list-item class="option" mat-ripple *ngFor="let user of userScores">
-            {{user.name}} ({{user.currentScore}})
-          </mat-list-item>
-        </mat-list>
-      </div>
-    </mat-card-content>
-  </mat-card>
-  <mat-card class="answer-game-grid-item" style="grid-column: 1 / -1;">
-    <mat-card-content>
-      <div class="card-content">
-        <button *ngIf="!lastQuestion" mat-raised-button color="primary" type="button" class="button" (click)="nextQuestion()">Next question</button>
-        <button *ngIf="lastQuestion" mat-raised-button color="primary" type="button" class="button" (click)="endGame()">End game</button>
+      <div class="questions-grid-container">
+        <div class="questions-grid-container-questions">
+          <div class="card-content">
+            <mat-card *ngFor="let result of answerResults" class="inner-card">
+              <mat-card-content class="inner-card-content">
+                  <table style="width:100%">
+                    <tr>
+                      <th>{{result.name}} Guess</th>
+                      <th>{{result.guessName}} Answer</th>
+                    </tr>
+                    <tr *ngFor="let answerPair of getAnswerPairs(result)" >
+                      <td style="width:50%" [ngClass]="{'green-text': answerPair.correct, 'red-text': !answerPair.correct}"><b>{{answerPair.guess}}</b></td>
+                      <td style="width:50%" [ngClass]="{'green-text': answerPair.correct, 'red-text': !answerPair.correct}"><b>{{answerPair.answer}}</b></td>
+                    </tr>
+                  </table>
+                  <span style="padding-top: 1vh;">{{result.name}} guess is <b *ngIf="result.correct" class="green-text">Correct</b> <b *ngIf="!result.correct" class="red-text">Incorrect</b></span>
+              </mat-card-content>
+            </mat-card>
+          </div>
+        </div>
+        <div class="questions-grid-container-users card-content">
+          <span class="teal-text title">Scores</span>
+          <span *ngFor="let user of userScores"><b>{{user.name}}: {{user.currentScore}}</b></span>
+        </div>
+        <div class="questions-grid-container-start start">
+          <button *ngIf="!lastQuestion" mat-raised-button color="primary" type="button" class="button" (click)="nextQuestion()">Next question</button>
+          <button *ngIf="lastQuestion" mat-raised-button color="primary" type="button" class="button" (click)="endGame()">End game</button>
+        </div>
       </div>
     </mat-card-content>
   </mat-card>

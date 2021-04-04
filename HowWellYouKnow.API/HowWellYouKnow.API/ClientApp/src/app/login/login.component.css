@@ -1,6 +1,6 @@
 .form-container{
-  width: 400px; 
-  margin: 0px auto; 
+  width: 400px;
+  margin: 0px auto;
 }
 
 .form-field{
@@ -31,8 +31,6 @@
 }
 
 .button {
-  height: 54px;
-  line-height: 54px;
   background-color: #26a69a!important;
   padding:  0 2rem;
 }

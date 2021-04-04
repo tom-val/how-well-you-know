@@ -1,16 +1,23 @@
+using System;
+using System.ComponentModel.DataAnnotations;
 using HowWellYouKnow.API.Hubs;
 using HowWellYouKnow.API.Services;
+using HowWellYouKnow.Domain.Dtos;
 using HowWellYouKnow.Infrastructure;
 using HowWellYouKnow.Infrastructure.Repositories;
 using HowWellYouKnow.Infrastructure.Services;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace HowWellYouKnow.API
 {
@@ -54,16 +61,30 @@ namespace HowWellYouKnow.API
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            if (env.IsDevelopment())
+            app.UseExceptionHandler(appBuilder =>
             {
-                app.UseDeveloperExceptionPage();
-            }
-            else
-            {
-                app.UseExceptionHandler("/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-                app.UseHsts();
-            }
+                appBuilder.Run(async context => {
+                    var ex = context.Features.Get<IExceptionHandlerPathFeature>();
+                    if (ex?.Error is NullReferenceException)
+                        context.Response.StatusCode = 404;
+                    else if (ex?.Error is InvalidOperationException)
+                        context.Response.StatusCode = 400;
+                    else if (ex?.Error is ValidationException)
+                        context.Response.StatusCode = 400;
+                    else
+                        context.Response.StatusCode = 500;
+
+                    context.Response.ContentType = "application/json";
+
+                    ApiError error = new ApiError()
+                    {
+                        StatusCode = context.Response.StatusCode,
+                        Message = ex?.Error.Message
+                    };
+
+                    await context.Response.WriteAsync(JsonConvert.SerializeObject(error, new JsonSerializerSettings { ContractResolver = new CamelCasePropertyNamesContractResolver() })).ConfigureAwait(false);
+                });
+            });
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();

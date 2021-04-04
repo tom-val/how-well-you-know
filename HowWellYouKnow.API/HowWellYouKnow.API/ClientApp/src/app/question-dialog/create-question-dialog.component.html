@@ -4,7 +4,7 @@
 
     <div class="name-input left-padding">
         <mat-form-field class="name">
-            <input matInput placeholder="Name" formControlName="name">
+            <input matInput placeholder="Enter question" formControlName="name">
         </mat-form-field>
         <mat-checkbox color="primary" formControlName="multipleAnswers">Multiple answers</mat-checkbox>
     </div>
@@ -15,7 +15,7 @@
             <div [formGroupName]="i">
                 <mat-list-item>
                     <mat-form-field style="width: 100%;">
-                        <input matInput formControlName="name">
+                        <input matInput formControlName="name" (keypress)="keyPress($event)" #input>
                         <button mat-button matSuffix mat-icon-button *ngIf="i !== 0" aria-label="Delete" (click)="deleteValue(i)">
                             <mat-icon>delete</mat-icon>
                         </button>

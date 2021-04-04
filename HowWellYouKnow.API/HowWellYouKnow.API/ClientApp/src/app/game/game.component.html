@@ -1,17 +1,15 @@
 <div *ngIf="gameState && game">
-<app-game-setup 
+<app-game-setup
 *ngIf="gameState?.currentGameState === 0"
-[gameId]="gameId" 
+[gameId]="gameId"
 [joinedUsers]="game?.joinedUsers"
 [questions]="game?.questions"
-[gameName]="game?.name"
-(questionAdded)="updateQuestions($event)"
-(userAdded)="updateUsers($event)">
+[gameName]="game?.name">
 </app-game-setup>
 
 <app-answer-question
 *ngIf="gameState?.currentGameState === 1"
-[gameId]="gameId" 
+[gameId]="gameId"
 [joinedUsers]="game?.joinedUsers"
 [question]="getCurrentQuestion()"
 [userScores]="gameState?.gameScores"
@@ -21,7 +19,7 @@
 
 <app-review-question
 *ngIf="gameState?.currentGameState === 2"
-[gameId]="gameId" 
+[gameId]="gameId"
 [question]="getCurrentQuestion()"
 [userScores]="gameState?.gameScores"
 [answerResults]="gameState?.answerResults"

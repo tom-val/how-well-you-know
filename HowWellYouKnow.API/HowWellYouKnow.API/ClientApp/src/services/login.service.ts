@@ -1,6 +1,6 @@
-import { EventEmitter, Injectable } from "@angular/core";
-import { Router } from "@angular/router";
-import { CookieService } from "ngx-cookie";
+import { EventEmitter, Injectable } from '@angular/core';
+import { Router } from '@angular/router';
+import { CookieService } from 'ngx-cookie';
 
 @Injectable()
 export class LoginService {
@@ -8,11 +8,11 @@ export class LoginService {
       constructor(private cookieService: CookieService, private router: Router) {
           this.loggedInUser$ = new EventEmitter();
        }
-       updateUser (userId:string):void {
-          this.loggedInUser$.emit(userId)
+       updateUser(userId: string): void {
+          this.loggedInUser$.emit(userId);
        }
 
-       logOut ():void {
+       logOut(): void {
          this.cookieService.remove('userId');
          this.loggedInUser$.emit('');
          this.router.navigate(['login']);
