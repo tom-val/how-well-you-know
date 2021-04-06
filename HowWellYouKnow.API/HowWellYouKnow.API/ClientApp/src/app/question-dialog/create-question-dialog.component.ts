@@ -1,5 +1,14 @@
 import { HttpClient } from '@angular/common/http';
-import { ChangeDetectorRef, Component, ElementRef, Inject, OnInit, QueryList, ViewChildren } from '@angular/core';
+import {
+  AfterViewInit,
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  Inject,
+  OnInit,
+  QueryList,
+  ViewChildren,
+} from '@angular/core';
 import {
   FormArray,
   FormBuilder,
@@ -12,11 +21,11 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { QuestionDto } from '../dtos/question-dto.model';
 
 @Component({
-  selector: "create-question-dialog",
+  selector: 'create-question-dialog',
   templateUrl: './create-question-dialog.component.html',
   styleUrls: ['./create-question-dialog.component.css'],
 })
-export class CreateQuestionDialogComponent implements OnInit {
+export class CreateQuestionDialogComponent implements OnInit, AfterViewInit {
   @ViewChildren('input') inputs: QueryList<ElementRef>;
 
   form: FormGroup;
@@ -35,6 +44,11 @@ export class CreateQuestionDialogComponent implements OnInit {
   ) {
     this.gameId = data.gameId;
   }
+  ngAfterViewInit(): void {
+    this.inputs.changes.subscribe(() => {
+      this.inputs.last.nativeElement.focus();
+    });
+  }
 
   ngOnInit() {
     this.form = this.fb.group({
@@ -45,11 +59,6 @@ export class CreateQuestionDialogComponent implements OnInit {
       multipleAnswers: new FormControl(false, [Validators.required]),
       variants: this.fb.array([this.createVariant()]),
     });
-
-    this.inputs.changes.subscribe(() => {
-      this.inputs.last.nativeElement.focus();
-  });
-
   }
 
   nextChar(c) {

@@ -50,7 +50,7 @@ namespace HowWellYouKnow.Infrastructure.Services
                             Name = v.Name,
                             Notation = v.Notation,
                         }).OrderBy(x => x.Notation).ToList(),
-                    }).ToList()
+                    }).OrderBy(x => x.Name).ToList()
                 }).FirstOrDefaultAsync();
         }
 

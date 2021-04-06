@@ -12,6 +12,7 @@
         <e p="ClientApp" t="Include">
           <e p=".browserslistrc" t="Include" />
           <e p=".editorconfig" t="Include" />
+          <e p=".eslintrc.json" t="Include" />
           <e p=".gitignore" t="Include" />
           <e p="angular.json" t="Include" />
           <e p="e2e" t="Include">
@@ -153,6 +154,7 @@
                 <e p="counter.component.ts" t="Include" />
               </e>
               <e p="dtos" t="Include">
+                <e p="api-error.ts" t="Include" />
                 <e p="enums" t="Include">
                   <e p="current-game-state.enum.ts" t="Include" />
                 </e>
@@ -225,7 +227,9 @@
             <e p="main.ts" t="Include" />
             <e p="polyfills.ts" t="Include" />
             <e p="Services" t="Include">
+              <e p="error.service.ts" t="Include" />
               <e p="login.service.ts" t="Include" />
+              <e p="signalr.service.ts" t="Include" />
             </e>
             <e p="styles.css" t="Include" />
             <e p="test.ts" t="Include" />
