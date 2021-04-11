@@ -30,7 +30,8 @@ namespace HowWellYouKnow.API.Services
 
             user = new User
             {
-                Name = request.Name
+                Name = request.Name,
+                Avatar = request.Avatar
             };
 
             await userRepository.SaveUser(user);
@@ -45,7 +46,17 @@ namespace HowWellYouKnow.API.Services
             return new UserDto
             {
                 Id = user.Id,
-                Name = user.Name
+                Name = user.Name,
+                Avatar = user.Avatar
+            };
+        }
+        
+        public async Task<UserDto> GetUserAvatar(Guid userId)
+        {
+            var user = await userRepository.GetUser(userId);
+            return new UserDto
+            {
+                Avatar = user.Avatar
             };
         }
     }

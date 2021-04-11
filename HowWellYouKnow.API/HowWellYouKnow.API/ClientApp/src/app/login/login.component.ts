@@ -14,15 +14,15 @@ import { LoginService } from 'src/services/login.service';
 })
 export class LoginComponent implements OnInit {
   loginForm: FormGroup;
+  image: string;
 
   constructor(
-    private http: HttpClient,
-    @Inject('BASE_URL') private baseUrl: string,
-    private _snackBar: MatSnackBar,
-    private cookieService: CookieService,
     private loginService: LoginService,
-    private formBuilder: FormBuilder,
-    private router: Router) {
+    private formBuilder: FormBuilder) {
+  }
+
+  imageUpdated(image: string) {
+    this.image = image;
   }
 
   loginButtonClick() {
@@ -30,17 +30,12 @@ export class LoginComponent implements OnInit {
       return;
     }
 
-      this.http.post<string>(this.baseUrl + 'api/user', this.loginForm.value).subscribe(result => {
-        this.cookieService.put('userId', result);
+    const user = {
+      ...this.loginForm.value,
+      avatar: this.image
+    };
 
-        this._snackBar.open('Login successfull', null, {
-          duration: 5000,
-        });
-
-        this.loginService.updateUser(result);
-
-        this.router.navigate(['']);
-      }, error => this._snackBar.open(JSON.stringify(error.message)));
+    this.loginService.login(user.name, user.avatar);
   }
 
   ngOnInit() {

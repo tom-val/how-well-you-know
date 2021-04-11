@@ -7,6 +7,9 @@ namespace HowWellYouKnow.Domain.Models
     public class User: BaseEntity
     {
         public string Name { get; set; }
+        
+        public string Avatar { get; set; }
+        
         public DateTime Created { get; set; }
         public List<Game> CreatedGames { get; set; }
         public List<Game> JoinedGames { get; set; }

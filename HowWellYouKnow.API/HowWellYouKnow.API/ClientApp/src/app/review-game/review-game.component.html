@@ -1,17 +1,11 @@
 <div class="grid-container">
   <mat-card class="header-grid-item">
-      <mat-card-header>
-        <mat-card-title>Results</mat-card-title>
-      </mat-card-header>
-      <mat-card-content class="inner-card-content">
-          <span *ngFor="let user of userScores">{{user.name}} final score: <b>{{user.currentScore}}</b></span>
+      <mat-card-content class="card-content">
+        <span class="teal-text title">Game is over</span>
+        <span class="teal-text title">{{winnerText}}</span>
+        <img *ngIf="showImage" style="width: 400px; height: 400px;" [src]="winnerAvatar"/>
+        <span *ngFor="let user of userScores">{{user.name}} final score: <b>{{user.currentScore}}</b></span>
+        <button mat-raised-button color="primary" class="button" routerLink="/" routerLinkActive="active">Home</button>
       </mat-card-content>
-  </mat-card>
-  <mat-card class="answer-game-grid-item" style="grid-column: 1 / -1;">
-    <mat-card-content>
-      <div class="card-content">
-        <button mat-raised-button color="primary" type="home-button" class="button" routerLink="/" routerLinkActive="active">Home</button>
-      </div>
-    </mat-card-content>
   </mat-card>
 </div>

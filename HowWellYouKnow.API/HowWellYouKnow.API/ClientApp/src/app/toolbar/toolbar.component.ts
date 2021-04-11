@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { CookieService } from 'ngx-cookie';
 import { UserDto } from '../dtos/user-dto.mode';
@@ -9,34 +9,17 @@ import { LoginService } from 'src/services/login.service';
   templateUrl: './toolbar.component.html',
   styleUrls: ['./toolbar.component.css']
 })
-export class ToolbarComponent {
+export class ToolbarComponent implements OnInit {
   userName = '';
   constructor(
-    private http: HttpClient,
     private cookieService: CookieService,
-    private loginService: LoginService,
-    @Inject('BASE_URL') private baseUrl: string) {
+    private loginService: LoginService) {
 
   }
 
   ngOnInit() {
-    if (this.cookieService.hasKey('userId')) {
-      this.setUserName();
-    }
-    this.loginService.loggedInUser$.subscribe(item => {
-      if (item) {
-        this.setUserName();
-      }
-      else {
-        this.userName = '';
-      }
-    });
-  }
-
-  setUserName() {
-    const userId = this.cookieService.get('userId');
-    this.http.get<UserDto>(this.baseUrl + 'api/user/' + userId +'/name').subscribe(result => {
-      this.userName = result.name;
+    this.loginService.username$.subscribe(item => {
+      this.userName = item;
     });
   }
 

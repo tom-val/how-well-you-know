@@ -1,0 +1,10 @@
+<canvas #canvas [ngClass]="erasing ? 'eraser-cursor' : 'pencil-cursor'"></canvas>
+<div class="button-container">
+  <button type="button" class="canvas-button" style="background-color: #000;" (click)="updateColor('#000')"></button>
+  <button type="button" class="canvas-button" style="background-color: #FF0000;" (click)="updateColor('#FF0000')"></button>
+  <button type="button" class="canvas-button" style="background-color: #FFFF00;" (click)="updateColor('#FFFF00')"></button>
+  <button type="button" class="canvas-button" style="background-color: #008000;" (click)="updateColor('#008000')"></button>
+  <button type="button" class="canvas-button" style="background-color: #00BFFF;" (click)="updateColor('#00BFFF	')"></button>
+  <button type="button" class="canvas-button" style="background-color: #0000FF;" (click)="updateColor('#0000FF')"></button>
+  <button type="button" class="eraser" (click)="erase()"></button>
+</div>

@@ -148,6 +148,10 @@
               <e p="app.component.ts" t="Include" />
               <e p="app.module.ts" t="Include" />
               <e p="app.server.module.ts" t="Include" />
+              <e p="canvas" t="Include">
+                <e p="canvas.component.css" t="Include" />
+                <e p="canvas.component.ts" t="Include" />
+              </e>
               <e p="counter" t="Include">
                 <e p="counter.component.html" t="Include" />
                 <e p="counter.component.spec.ts" t="Include" />
@@ -246,7 +250,7 @@
           <e p="GameController.cs" t="Include" />
           <e p="InfrastructureController.cs" t="Include" />
           <e p="QuestionController.cs" t="Include" />
-          <e p="UserController.cs" t="Include" />
+          <e p="UsersController.cs" t="Include" />
           <e p="WeatherForecastController.cs" t="Include" />
         </e>
         <e p="HowWellYouKnow.API.csproj" t="IncludeRecursive" />
@@ -355,6 +359,8 @@
           <e p="20210327075440_CountQuestions.Designer.cs" t="Include" />
           <e p="20210327075739_MakeCountOptional.cs" t="Include" />
           <e p="20210327075739_MakeCountOptional.Designer.cs" t="Include" />
+          <e p="20210411071330_AddAvatar.cs" t="Include" />
+          <e p="20210411071330_AddAvatar.Designer.cs" t="Include" />
           <e p="DatabaseContextModelSnapshot.cs" t="Include" />
         </e>
         <e p="ModelBindings" t="Include">

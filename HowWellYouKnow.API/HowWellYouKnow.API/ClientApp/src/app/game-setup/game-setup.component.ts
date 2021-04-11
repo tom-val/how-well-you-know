@@ -4,7 +4,7 @@ import { CreateQuestionDialogComponent } from '../question-dialog/create-questio
 import { UserDto } from '../dtos/user-dto.mode';
 import { QuestionDto } from '../dtos/question-dto.model';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { ErrorService } from 'src/services/error.service';
+import { SnackbarService } from 'src/services/snackbar.service';
 
 @Component({
   selector: 'app-game-setup',
@@ -20,7 +20,7 @@ export class GameSetupComponent implements OnInit {
   constructor(
     @Inject('BASE_URL') private baseUrl: string,
     private http: HttpClient,
-    private errorService: ErrorService,
+    private errorService: SnackbarService,
     private dialog: MatDialog) {
   }
 

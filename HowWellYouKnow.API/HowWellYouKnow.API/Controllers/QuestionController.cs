@@ -4,32 +4,25 @@ using System.Linq;
 using System.Threading.Tasks;
 using HowWellYouKnow.API.Requests;
 using HowWellYouKnow.API.Services;
-using HowWellYouKnow.Domain.Dtos;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HowWellYouKnow.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/game/{gameId}/[controller]")]
     [ApiController]
-    public class UserController : ControllerBase
+    public class QuestionController : ControllerBase
     {
-        private UserService userService;
-        public UserController(UserService userService)
+        private QuestionsService questionsService;
+        public QuestionController(QuestionsService questionsService)
         {
-            this.userService = userService;
+            this.questionsService = questionsService;
         }
 
         [HttpPost]
-        public Task<Guid> CreateGet(UserRequest request)
+        public Task<Guid> Create(CreateQuestionRequest request, [FromRoute] Guid gameId, [FromHeader] Guid userId)
         {
-            return userService.CreateOrReturnUser(request);
-        }
-
-        [HttpGet("{id}/name")]
-        public Task<UserDto> GetUserName([FromRoute] Guid id)
-        {
-            return userService.GetUserName(id);
+            return questionsService.CreateQuestion(request, gameId, userId);
         }
     }
 }

@@ -1,8 +1,7 @@
 .grid-container {
   display: grid;
   grid-template-areas:
-    'header header'
-    'answer answer';
+    'header header';
   grid-gap: 10px;
   padding: 10px;
   justify-content: center;
@@ -17,9 +16,18 @@
   min-width: 40vh;
 }
 
-.answer-grid-item {
-  grid-area: answer;
-  min-width: 40vh;
+.teal-text {
+  color: #009688;
+}
+
+.button {
+  margin-top: 1vh;
+  background-color: #26a69a!important;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 300;
 }
 
 .card-content {
@@ -28,14 +36,4 @@
   align-items: center;
   justify-content: center;
   min-height: inherit;
-}
-
-.inner-card {
-  width: 100%;
-  margin-bottom: 1rem;
-}
-
-.inner-card-content {
-  display: flex;
-  flex-direction: column;
 }

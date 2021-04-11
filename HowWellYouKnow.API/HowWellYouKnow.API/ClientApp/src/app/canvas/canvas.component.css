@@ -1,0 +1,30 @@
+canvas {
+  border: 1px solid #000;
+}
+
+.pencil-cursor {
+  cursor: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAACgUlEQVRIS7WUTWgTQRiG39lumwRrG0gNgmgrFqVKMMVclECKPz2J1nZLcosnsYgUBBUP4s9F0J4UsfVir3oxJlHUCiuiUvDQg4ooiLU1TdOmSdo0aTc7uyO7iVDUxG227nn2eeeb95kh+M8fqZY/OXikW0nTO4TnqOQkV7cHI0N/Y1UVkAqf2JJ5NTHOKCOSwjC7JKPRZetz9z8Z/D2kqoDv70NjLDblZu9GkPixAElRYd9mebH7wtNDpgNio9c6pabuZxool8tj/vUw1I8fsKHVdrPtTLTfdMC0KLykDT5foWE/4okkFKqApym676BQa7qDhNjTBZCHGiizZEOSeKDYXHDwX87u8p4cWIMAYRxAM1UYppKSziPWTW88XUPecjYaLjkhCpcBXNJAc/MycsuKzrRa+FbXsdBXUwFpscteAP8NgH1ZUjGTKeg8DrixJxA9V+kuGZogIQrDAIIaKJEqQJJV7XCyznq1ufnw47SpgLgodHCAqEEW8wpSWVnn1fJcn1sI/3GxVq2ppiUBfIxBL1ZRGQjIJ08gstPIM1PxiGbE3uMM7J6uZZZiIU+Lxdq4TtfR8IipgGKxNWMAaZEpQ3yupCUhDzz+iN8IXNe43MKVWiYzMvKSpiXJWi017ZW0NNRBXAy0cKBjmpZLkorZkpY8wfV2f/S80d2XnWClltNzBRSoCg4k1lSvuv6lpaEJJkK9zNLIkM0pSC+WtKxFwN0Tvb+a3Zed4PNdP+PqVKQggbOqIISMevyRvauFVwzI5IvvTd16yA4nOtp6H71ds4Dbpw+wrU4bHA5+3L6OencEo7Fq4GUnGDjlS27eaLnlv/j8SrXgX/8ZeuzMhPwEpp4GKPQfwq8AAAAASUVORK5CYII=) 0 25, auto;
+}
+
+.eraser-cursor {
+  cursor: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAABEUlEQVRIS2NkoDFgpLH5DERb8DFx4oT/jIz5xDqI8f//ifzz8wuIsuB90sQGRgbGemINB6kj2oL3Cf0CjEzM9xkYGARIseD/v7+KggsKHxD0AXmuZ1zIPz83AewTfK6i1PWELSAr7BGux2sBNVyP3wIquB6nBdRyPW4LkiaBMkg/KcmS8T9q2MP0Yk1FX+fuec3IwiRCigV/337R4S3yu4quB8OCL1O3VjDxcLaTYvj/33+ucKe46WLTg2EBOa5n+PQ9hCvXey1BC6jteoxIprbrUSyghetRLKCF6+EW0Mr1cAu+zd11n4GFRYGUpIkv5SCbA06mJFnw79/3f99+NvFke3cQ4yCCFQ4xhuBTQ3MLANhNlhkGHbIxAAAAAElFTkSuQmCC) 0 25, auto;
+}
+
+.button-container {
+  display: flex;
+  padding-bottom: 1vh;
+}
+
+.eraser {
+  margin-left: auto;
+  border-style: none;
+  width: 24px;
+  height: 24px;
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAABEUlEQVRIS2NkoDFgpLH5DERb8DFx4oT/jIz5xDqI8f//ifzz8wuIsuB90sQGRgbGemINB6kj2oL3Cf0CjEzM9xkYGARIseD/v7+KggsKHxD0AXmuZ1zIPz83AewTfK6i1PWELSAr7BGux2sBNVyP3wIquB6nBdRyPW4LkiaBMkg/KcmS8T9q2MP0Yk1FX+fuec3IwiRCigV/337R4S3yu4quB8OCL1O3VjDxcLaTYvj/33+ucKe46WLTg2EBOa5n+PQ9hCvXey1BC6jteoxIprbrUSyghetRLKCF6+EW0Mr1cAu+zd11n4GFRYGUpIkv5SCbA06mJFnw79/3f99+NvFke3cQ4yCCFQ4xhuBTQ3MLANhNlhkGHbIxAAAAAElFTkSuQmCC) no-repeat;
+}
+
+.canvas-button {
+  margin-right: 1vh;
+  width: 24px;
+  height: 24px;
+}
