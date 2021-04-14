@@ -150,6 +150,7 @@
               <e p="app.server.module.ts" t="Include" />
               <e p="canvas" t="Include">
                 <e p="canvas.component.css" t="Include" />
+                <e p="canvas.component.html" t="Include" />
                 <e p="canvas.component.ts" t="Include" />
               </e>
               <e p="counter" t="Include">
@@ -231,9 +232,9 @@
             <e p="main.ts" t="Include" />
             <e p="polyfills.ts" t="Include" />
             <e p="Services" t="Include">
-              <e p="error.service.ts" t="Include" />
               <e p="login.service.ts" t="Include" />
               <e p="signalr.service.ts" t="Include" />
+              <e p="snackbar.service.ts" t="Include" />
             </e>
             <e p="styles.css" t="Include" />
             <e p="test.ts" t="Include" />
