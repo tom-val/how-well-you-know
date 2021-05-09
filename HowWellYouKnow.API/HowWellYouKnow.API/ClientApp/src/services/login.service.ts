@@ -56,6 +56,10 @@ export class LoginService {
          this.setUser();
        }
 
+       getUserId(): string {
+         return this.currentUser.id;
+       }
+
        logOut(): void {
          this.cookieService.remove('userId');
          this.username$.emit('');

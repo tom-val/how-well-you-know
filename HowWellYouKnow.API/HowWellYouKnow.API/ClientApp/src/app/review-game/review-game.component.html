@@ -1,11 +1,15 @@
 <div class="grid-container">
   <mat-card class="header-grid-item">
+      <canvas id="myCanvas" class="canvas"></canvas>
       <mat-card-content class="card-content">
         <span class="teal-text title">Game is over</span>
         <span class="teal-text title">{{winnerText}}</span>
         <img *ngIf="showImage" style="width: 400px; height: 400px;" [src]="winnerAvatar"/>
         <span *ngFor="let user of userScores">{{user.name}} final score: <b>{{user.currentScore}}</b></span>
-        <button mat-raised-button color="primary" class="button" routerLink="/" routerLinkActive="active">Home</button>
+        <button mat-raised-button color="primary" class="home-button" routerLink="/" routerLinkActive="active">Play Again</button>
+        <div class="button-container">
+          <button *ngIf="isWinner()" type="button" class="bomb red-button" (click)="explode()"></button>
+        </div>
       </mat-card-content>
   </mat-card>
 </div>

@@ -1,8 +1,10 @@
 import { Component, Inject, Input, OnInit } from '@angular/core';
 import { GameScoreDto } from '../dtos/game-state-dto.model';
 import { HttpClient } from '@angular/common/http';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { UserDto } from '../dtos/user-dto.mode';
+import { createEmitter, IEmitter } from 'particle-explosions-3.0.1';
+import { interval, Subscription } from 'rxjs';
+import { LoginService } from 'src/services/login.service';
 
 @Component({
   selector: 'app-review-game',
@@ -13,21 +15,46 @@ export class ReviewGameComponent implements OnInit {
   @Input() userScores: GameScoreDto[];
 
   winnerText: string;
+  currentUserId: string;
   winnerId: string;
   winnerAvatar: string;
   showImage = false;
-
+  subscription: Subscription;
+  emitter: IEmitter;
+  
   constructor(
     private http: HttpClient,
+    private loginService: LoginService,
     @Inject('BASE_URL') private baseUrl: string) {
   }
 
   ngOnInit(): void {
     this.getWinnerText();
 
+    this.currentUserId = this.loginService.getUserId();
+
     if (this.winnerId) {
       this.getWinnerImage(this.winnerId);
     }
+  }
+
+  explode(): void {
+    const canvas = document.getElementById('myCanvas') as HTMLCanvasElement;
+    const ctx = canvas.getContext('2d')
+
+    this.emitter = createEmitter(ctx)
+    this.emitter.explode(250, {
+      color: ['#FF5733', '#B43D23', '#FF5733', '#693428']
+    })
+
+    const source = interval(1500);
+    this.subscription = source.subscribe(val =>  this.emitter.explode(250, {
+      color: ['#FF5733', '#B43D23', '#FF5733', '#693428'] 
+    }));
+  }
+
+  isWinner() {
+    return this.winnerId === this.currentUserId;
   }
 
   getWinnerText(): void {

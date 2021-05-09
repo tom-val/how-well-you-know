@@ -16,13 +16,39 @@
   min-width: 40vh;
 }
 
+.canvas {
+  position: absolute;
+  min-height: inherit;
+  height: 40vh;
+  width: 40vh;
+}
+
 .teal-text {
   color: #009688;
 }
 
-.button {
-  margin-top: 1vh;
+.home-button {
+  margin-top: 0.5vh;
   background-color: #26a69a!important;
+  z-index: 1;
+}
+
+.red-button {
+  margin-left: auto;
+}
+
+.button-container {
+  display: flex;
+  width: 100%;
+}
+
+.bomb {
+  margin-left: auto;
+  border-style: none;
+  width: 24px;
+  height: 24px;
+  z-index: 1;
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAACXBIWXMAAA7EAAAOxAGVKw4bAAAB1ElEQVRIic2UMUhVYRiGn3u5RIRcIiLkIg5N4RAhF3GQpmhwCJEmh3CKRoeGJsGxMSTCKZzEqeEi0tjsrKEiDhENV3EQB83et+H8B/978HT+Kwp98MN3fr7/fd/zfh8f/I9haBieCKYErWsnELwTnBps+GEYvTZww6jg2LBheGs4MawWal4KHl8FvG7oBNAJQctwKPga1YwJfgYBg6nAg8H3ZwILlg11QdOwGWx6FIl4bXjqBOCG4GMA3RbsGrqGh3mNYFpwIjgSvDHc/hcggpbglWDRsOqLZubnu2GkYNukYd/wx/C+VK1hISi0ItBiLtg2NOP3ggeCecHkZeBNQUe9IKW54NAwFL2/b6hHZE3DZ8NE/ouLBRuqzpcc0NkkdQQzgka4exEav4KgHcauB6TCoj3D3aB2PPTlg6IGG6YM9zB8SrGlmBtmIrC24U5Zczf7tCcnWyodxyjq9DarMvKaWvSuiuCsCO7ou5hHNeepBDtBEbULdSn5TirBWqy8KkLNOdGCq3owJPjV5xR9M9xKIggks5fsnLLp6RrayeCBoGGYE/yuAD8yPE+xsoxo3LDubP3GtnSV7ZbhfjFrxQtn+6RFtpIHgANgCzioga4q/sbiL6qtmYa89BEzAAAAAElFTkSuQmCC) no-repeat;
 }
 
 .title {
