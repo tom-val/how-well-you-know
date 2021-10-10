@@ -20,9 +20,9 @@ namespace HowWellYouKnow.API.Controllers
         }
 
         [HttpPost]
-        public Task<Guid> Create(CreateQuestionRequest request, [FromRoute] Guid gameId, [FromHeader] Guid userId)
+        public Task<Guid> Create(CreateQuestionRequest request, [FromRoute] Guid gameId)
         {
-            return questionsService.CreateQuestion(request, gameId, userId);
+            return questionsService.CreateQuestion(request, gameId);
         }
     }
 }

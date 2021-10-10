@@ -35,16 +35,7 @@ namespace HowWellYouKnow.API.Services
         {
             var user = await userRepository.GetUser(userId);
 
-            var game = new Game
-            {
-                Name = request.Name,
-                CreatedByUserId = userId,
-                JoinedUsers = new List<User> { user },
-                GameState = new GameState
-                {
-                    CurrentGameState = CurrentGameState.NotStarted,
-                }
-            };
+            var game = Game.Create(request.Name, user);
 
             await gameRepository.SaveGame(game);
             await gameRepository.SaveChanges();
@@ -73,23 +64,7 @@ namespace HowWellYouKnow.API.Services
         {
             var game = await gameRepository.GetGame(gameId);
 
-            if (game.GameState.CurrentGameState != CurrentGameState.NotStarted)
-            {
-                throw new ValidationException("You cannot start game that already started");
-            }
-
-            if (game.JoinedUsers.Count < 2)
-            {
-                throw new ValidationException("You need at least 2 users to start the game");
-            }
-
-            game.GameState.CurrentGameState = CurrentGameState.AnsweringQuestion;
-            game.GameState.CurrentQuestion = game.Questions.OrderBy(x => x.Order).First();
-            game.GameState.GameScores = game.JoinedUsers.Select(u => new UserGameScore
-            {
-                UserId = u.Id,
-                CurrentScore = 0
-            }).ToList();
+            game.StartGame();
 
             await gameRepository.SaveChanges();
 
@@ -102,19 +77,7 @@ namespace HowWellYouKnow.API.Services
         {
             var game = await gameRepository.GetGame(gameId);
 
-            if (game.GameState.CurrentGameState != CurrentGameState.QuestionReview)
-            {
-                throw new ValidationException("You cannot get next question");
-            }
-
-
-            game.GameState.CurrentGameState = CurrentGameState.AnsweringQuestion;
-            game.GameState.CurrentQuestion = game.Questions.OrderBy(x => x.Order).SkipWhile(item => item.Id != game.GameState.CurrentQuestionId).Skip(1).FirstOrDefault();
-
-            if(game.GameState.CurrentQuestion == null)
-            {
-                game.GameState.CurrentGameState = CurrentGameState.GameReview;
-            }
+            game.NextQuestion();
 
             await gameRepository.SaveChanges();
 
@@ -127,8 +90,7 @@ namespace HowWellYouKnow.API.Services
         {
             var game = await gameRepository.GetGame(gameId);
 
-            game.GameState.CurrentGameState = CurrentGameState.GameReview;
-            game.GameState.CurrentQuestionId = null;
+            game.EndGame();
 
             await gameRepository.SaveChanges();
 

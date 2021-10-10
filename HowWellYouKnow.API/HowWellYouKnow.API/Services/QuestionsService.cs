@@ -14,43 +14,22 @@ namespace HowWellYouKnow.API.Services
 {
     public class QuestionsService
     {
-        private QuestionRepository questionRepository;
         private GameRepository gameRepository;
         private readonly IHubContext<QuestionsHub> hubContext;
-        public QuestionsService(GameRepository gameRepository, QuestionRepository questionRepository, IHubContext<QuestionsHub> hubContext)
+        public QuestionsService(GameRepository gameRepository, IHubContext<QuestionsHub> hubContext)
         {
-            this.questionRepository = questionRepository;
             this.hubContext = hubContext;
             this.gameRepository = gameRepository;
         }
 
-        public async Task<Guid> CreateQuestion(CreateQuestionRequest request, Guid gameId, Guid userId)
+        public async Task<Guid> CreateQuestion(CreateQuestionRequest request, Guid gameId)
         {
-
-            if (request.Variants.Count < 2)
-            {
-                throw new ValidationException("Invalid number of varitants");
-            }
 
             var game = await gameRepository.GetGameWithQuestions(gameId);
 
-            var question = new Question
-            {
-                Name = request.Name,
-                MultipleAnswers = request.MultipleAnswers,
-                GameId = gameId,
-                Order = game.Questions.Count + 1,
-                Variants = request.Variants.Select(v => new QuestionVariant
-                {
-                    Name = v.Name,
-                    Notation = v.Notation,
-                }).ToList()
-            };
+            var question = game.AddQuestion(request.Variants, request.Name, request.MultipleAnswers);
 
-            game.Questions.Add(question);
-            game.LastQuestion = question;
-
-            await questionRepository.SaveChanges();
+            await gameRepository.SaveChanges();
 
             await hubContext.Clients.All.SendAsync(gameId.ToString(), new QuestionDto
             {
