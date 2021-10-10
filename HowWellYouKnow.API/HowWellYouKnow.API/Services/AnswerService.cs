@@ -28,24 +28,7 @@ namespace HowWellYouKnow.API.Services
         {
             var question = await questionRepository.GetQuestion(request.QuestionId);
 
-            if(!question.MultipleAnswers && request.QuestionVariants.Count != 1)
-            {
-                throw new ValidationException("Wrong variant count");
-            }
-
-            if(question.Answers.Any(x => x.UserId == userId))
-            {
-                throw new ValidationException("Answer already saved");
-            }
-
-            var questionVariants = question.Variants.Where(x => request.QuestionVariants.Contains(x.Id)).ToList();
-
-            var answer = new Answer
-            {
-                QuestionId = request.QuestionId,
-                UserId = userId,
-                QuestionVariants = questionVariants
-            };
+            var answer = Answer.Create(question, request.QuestionVariants, userId);
 
             await answerRepository.SaveAnswer(answer);
             await answerRepository.SaveChanges();
@@ -57,33 +40,14 @@ namespace HowWellYouKnow.API.Services
         {
             var question = await questionRepository.GetQuestion(request.QuestionId);
 
-            if (!question.MultipleAnswers && request.QuestionVariants.Count != 1)
-            {
-                throw new ValidationException("Wrong variant count");
-            }
+            var guess = Guess.Create(request.GuessUser, request.QuestionVariants, userId, question);
 
-            if (question.Guesses.Any(x => x.UserId == userId && x.GuessUserId == request.GuessUser))
-            {
-                throw new ValidationException("Guess already saved");
-            }
-
-
-            var questionVariants = question.Variants.Where(x => request.QuestionVariants.Contains(x.Id)).ToList();
-
-            var answer = new Guess
-            {
-                QuestionId = request.QuestionId,
-                UserId = userId,
-                QuestionVariants = questionVariants,
-                GuessUserId = request.GuessUser
-            };
-
-            await guessRepository.SaveGuess(answer);
+            await guessRepository.SaveGuess(guess);
             await guessRepository.SaveChanges();
 
             await gameStatusService.CheckIfAllAnswered(gameId);
 
-            return answer.Id;
+            return guess.Id;
         }
     }
 }
