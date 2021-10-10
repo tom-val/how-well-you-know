@@ -8,11 +8,11 @@ namespace HowWellYouKnow.Domain.Models
     public class Answer : BaseEntity
     {
         private Answer() { }
-        public Guid QuestionId { get; set; }
-        public Question Question { get; set; }
-        public List<QuestionVariant> QuestionVariants { get; set; }
-        public User User { get; set; }
-        public Guid UserId { get; set; }
+        public Guid QuestionId { get; private set; }
+        public Question Question { get; private set; }
+        public List<QuestionVariant> QuestionVariants { get; private set; }
+        public User User { get; private set; }
+        public Guid UserId { get; private set; }
 
         public static Answer Create(Question question, List<Guid> questionVariantIds, Guid userId)
         {
