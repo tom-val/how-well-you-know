@@ -11,7 +11,7 @@ namespace HowWellYouKnow.Domain.Models
 {
     public class Game: BaseEntity
     {
-        private List<Question> questions;
+        private List<Question> questions = new List<Question>();
 
         private Game() { }
         public string Name { get; private set; }
@@ -53,14 +53,19 @@ namespace HowWellYouKnow.Domain.Models
             };
         }
 
-        public Question AddQuestion(List<QuestionVariantDto> variants, string name, bool multipleAnswers)
+        public Result<Question> AddQuestion(List<QuestionVariantDto> variants, string name, bool multipleAnswers)
         {
-            var question = Question.Create(variants, name, multipleAnswers, this);
+            var questionResult = Question.Create(variants, name, multipleAnswers, this);
 
-            questions.Add(question);
-            LastQuestion = question;
+            if (!questionResult.IsSuccess)
+            {
+                return questionResult;
+            }
 
-            return question;
+            questions.Add(questionResult.Value);
+            LastQuestion = questionResult.Value;
+
+            return questionResult;
         }
 
         public void StartGame()
