@@ -1,4 +1,5 @@
-﻿using HowWellYouKnow.API.Hubs;
+﻿using HowWellYouKnow.API.Exceptions;
+using HowWellYouKnow.API.Hubs;
 using HowWellYouKnow.API.Requests;
 using HowWellYouKnow.Domain.Dtos;
 using HowWellYouKnow.Domain.Models;
@@ -27,10 +28,16 @@ namespace HowWellYouKnow.API.Services
 
             var game = await gameRepository.GetGameWithQuestions(gameId);
 
-            var question = game.AddQuestion(request.Variants, request.Name, request.MultipleAnswers);
+            var questionResult = game.AddQuestion(request.Variants, request.Name, request.MultipleAnswers);
+
+            if (!questionResult.IsSuccess)
+            {
+                throw new DomainValidationException(questionResult);
+            }
 
             await gameRepository.SaveChanges();
 
+            var question = questionResult.Value;
             await hubContext.Clients.All.SendAsync(gameId.ToString(), new QuestionDto
             {
                 Id = question.Id,

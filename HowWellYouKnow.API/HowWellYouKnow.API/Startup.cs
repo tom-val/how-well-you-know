@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using HowWellYouKnow.API.Exceptions;
 using HowWellYouKnow.API.Hubs;
 using HowWellYouKnow.API.Services;
 using HowWellYouKnow.Domain.Dtos;
@@ -70,6 +71,8 @@ namespace HowWellYouKnow.API
                     else if (ex?.Error is InvalidOperationException)
                         context.Response.StatusCode = 400;
                     else if (ex?.Error is ValidationException)
+                        context.Response.StatusCode = 400;
+                    else if (ex?.Error is DomainValidationException)
                         context.Response.StatusCode = 400;
                     else
                         context.Response.StatusCode = 500;

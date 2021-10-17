@@ -1,4 +1,5 @@
 ﻿using HowWellYouKnow.Domain.Dtos;
+using HowWellYouKnow.Domain.Dtos.Validation;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -23,29 +24,52 @@ namespace HowWellYouKnow.Domain.Models
         public int Order { get; set; }
         public Game LastQuestionGame { get; set; }
 
-        public static Question Create(List<QuestionVariantDto> variants, string name, bool multipleAnswers, Game game)
+        public static Result<Question> Create(List<QuestionVariantDto> variants, string name, bool multipleAnswers, Game game)
         {
+            var validationErrors = new List<ValidationError>();
+
             if (string.IsNullOrEmpty(name) || name.Length > 200)
             {
-                throw new ValidationException("Name length is invalid");
+                validationErrors.Add(new ValidationError
+                {
+                    Field = nameof(name),
+                    Error = "Name length is invalid"
+                });
             }
 
             if (variants.Count < 2)
             {
-                throw new ValidationException("Invalid number of varitants");
+                validationErrors.Add(new ValidationError
+                {
+                    Field = nameof(variants),
+                    Error = "Invalid number of variants"
+                });
             }
 
-            return new Question
+            if(validationErrors.Count > 0)
             {
-                Name = name,
-                MultipleAnswers = multipleAnswers,
-                GameId = game.Id,
-                Order = game.Questions.Count + 1,
-                Variants = variants.Select(v => new QuestionVariant
+                return new Result<Question>
                 {
-                    Name = v.Name,
-                    Notation = v.Notation,
-                }).ToList()
+                    Errors = validationErrors.ToList(),
+                    IsSuccess = false,
+                };
+            }
+
+            return new Result<Question>
+            {
+                IsSuccess = true,
+                Value = new Question
+                {
+                    Name = name,
+                    MultipleAnswers = multipleAnswers,
+                    GameId = game.Id,
+                    Order = game.Questions.Count + 1,
+                    Variants = variants.Select(v => new QuestionVariant
+                    {
+                        Name = v.Name,
+                        Notation = v.Notation,
+                    }).ToList()
+                }
             };
         }
     }
