@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HowWellKnow.API.Game", "HowWellKnow.API.Game\HowWellKnow.API.Game.csproj", "{AE63BA88-A80A-4496-B120-B2C23E9551AE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HowWellKnow.API.Tests", "HowWellKnow.API.Tests\HowWellKnow.API.Tests.csproj", "{98A9958A-03D4-48CA-9B01-FBC010D41BCE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C4244195-24FE-437D-8E7D-B6CBD89191CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C4244195-24FE-437D-8E7D-B6CBD89191CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C4244195-24FE-437D-8E7D-B6CBD89191CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C4244195-24FE-437D-8E7D-B6CBD89191CF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AE63BA88-A80A-4496-B120-B2C23E9551AE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AE63BA88-A80A-4496-B120-B2C23E9551AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AE63BA88-A80A-4496-B120-B2C23E9551AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AE63BA88-A80A-4496-B120-B2C23E9551AE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{98A9958A-03D4-48CA-9B01-FBC010D41BCE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{98A9958A-03D4-48CA-9B01-FBC010D41BCE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{98A9958A-03D4-48CA-9B01-FBC010D41BCE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{98A9958A-03D4-48CA-9B01-FBC010D41BCE}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
