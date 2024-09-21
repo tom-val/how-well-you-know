@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KnowMe.API", "KnowMe.API\KnowMe.API.csproj", "{FAA9BCA3-6614-487D-BCAA-65C47178A0E4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KnowMe.API.Domain", "KnowMe.API.Domain\KnowMe.API.Domain.csproj", "{395AAD49-80E1-40D5-9DA6-BC3B9496CA73}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KnowMe.API.Database", "KnowMe.API.Database\KnowMe.API.Database.csproj", "{95C46F34-FCC4-49BE-9D4A-E2AAC7314D29}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FAA9BCA3-6614-487D-BCAA-65C47178A0E4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FAA9BCA3-6614-487D-BCAA-65C47178A0E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FAA9BCA3-6614-487D-BCAA-65C47178A0E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FAA9BCA3-6614-487D-BCAA-65C47178A0E4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{395AAD49-80E1-40D5-9DA6-BC3B9496CA73}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{395AAD49-80E1-40D5-9DA6-BC3B9496CA73}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{395AAD49-80E1-40D5-9DA6-BC3B9496CA73}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{395AAD49-80E1-40D5-9DA6-BC3B9496CA73}.Release|Any CPU.Build.0 = Release|Any CPU
+		{95C46F34-FCC4-49BE-9D4A-E2AAC7314D29}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{95C46F34-FCC4-49BE-9D4A-E2AAC7314D29}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{95C46F34-FCC4-49BE-9D4A-E2AAC7314D29}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{95C46F34-FCC4-49BE-9D4A-E2AAC7314D29}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
