@@ -10,7 +10,7 @@ public class QuestionVariant
     public Question Question { get; private set;}
     public Guid QuestionId { get; private set;}
 
-    public static Result<QuestionVariant> Create(string text, char notation)
+    public static Result<QuestionVariant> Create(Question question, string text, char notation)
     {
         var errors = new List<ValidationError>();
 
@@ -31,7 +31,9 @@ public class QuestionVariant
         {
             Id = Guid.NewGuid(),
             Text = text,
-            Notation = notation
+            Notation = notation,
+            Question = question,
+            QuestionId = question.Id
         };
 
         return Result<QuestionVariant>.Success(variant);

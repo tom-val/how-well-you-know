@@ -27,6 +27,11 @@ public class Question
             });
         }
 
+        if (errors.Count != 0)
+        {
+            return Result<Question>.Failure(errors);
+        }
+
         UserChoices.Add(choice);
 
         return Result<Question>.Success(this);
@@ -50,17 +55,13 @@ public class Question
 
         UserGuesses.Add(guess);
 
-        //If everyone answered, calculate question result
         var peopleCount = Game.Players.Count;
         var guessCount = peopleCount * (peopleCount - 1);
 
-        if (UserGuesses.Count != guessCount)
+        if (UserGuesses.Count == guessCount && UserChoices.Count == peopleCount)
         {
-            return Result<Question>.Success(this);
+            Answered = true;
         }
-
-        Answered = true;
-        //Raise question answered domain event
 
         return Result<Question>.Success(this);
     }
@@ -69,14 +70,14 @@ public class Question
     //Decrease one point for each incorrect answer
     private int CalculateMultipleAnswersScore(List<Guid> shouldNotBeSelected, List<Guid> shouldBeSelected)
     {
-        var incorrectAnswersCount = shouldBeSelected.Count + shouldBeSelected.Count;
+        var incorrectAnswersCount = shouldNotBeSelected.Count + shouldBeSelected.Count;
         var score = 3 - incorrectAnswersCount;
         return score < 0 ? 0 : score;
     }
 
     private int CalculateNonMultipleAnswersScore(List<Guid> shouldNotBeSelected, List<Guid> shouldBeSelected)
     {
-        var incorrectAnswersCount = shouldBeSelected.Count + shouldBeSelected.Count;
+        var incorrectAnswersCount = shouldNotBeSelected.Count + shouldBeSelected.Count;
         return incorrectAnswersCount == 0 ? 1 : 0;
     }
 
@@ -147,8 +148,23 @@ public class Question
             });
         }
 
+        if (errors.Count != 0)
+        {
+            return Result<Question>.Failure(errors);
+        }
+
+        var question = new Question
+        {
+            Id = Guid.NewGuid(),
+            Text = text,
+            CreatedByUser = createdBy.Id,
+            GameId = game.Id,
+            Game = game,
+            MultipleAnswers = multipleAnswers
+        };
+
         var createdQuestionVariants = new List<QuestionVariant>();
-        foreach (var questionVariant in variants.Select(variant => QuestionVariant.Create(variant.Value, variant.Key)))
+        foreach (var questionVariant in variants.Select(variant => QuestionVariant.Create(question, variant.Value, variant.Key)))
         {
             if (!questionVariant.IsSuccess)
             {
@@ -165,15 +181,7 @@ public class Question
             return Result<Question>.Failure(errors);
         }
 
-        var question = new Question
-        {
-            Id = Guid.NewGuid(),
-            Text = text,
-            AnswerVariants = createdQuestionVariants,
-            CreatedByUser = createdBy.Id,
-            GameId = game.Id,
-            MultipleAnswers = multipleAnswers
-        };
+        question.AnswerVariants = createdQuestionVariants;
 
         return Result<Question>.Success(question);
     }

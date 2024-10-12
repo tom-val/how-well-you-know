@@ -20,6 +20,14 @@ public class QuestionUserChoice
             });
         }
 
+        if (selectedVariants.GroupBy(v => v.Notation).Any(g => g.Count() > 1))
+        {
+            errors.Add(new ValidationError
+            {
+                Message = "Duplicate selected variants provided"
+            });
+        }
+
         if (!question.MultipleAnswers && selectedVariants.Count != 1)
         {
             errors.Add(new ValidationError
