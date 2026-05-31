@@ -25,3 +25,15 @@ output "cloudfront_distribution_id" {
 output "cloudfront_domain_name" {
   value = module.cloudfront.distribution_domain_name
 }
+
+output "authorizer_function_name" {
+  value = module.lambda_authorizer.function_name
+}
+
+output "cognito_user_pool_id" {
+  value = module.cognito.user_pool_id
+}
+
+output "cognito_client_id" {
+  value = module.cognito.user_pool_client_id
+}

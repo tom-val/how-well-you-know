@@ -124,6 +124,7 @@ DEPLOY_POLICY=$(cat <<JSON
         "lambda:*",
         "apigateway:*",
         "logs:*",
+        "cognito-idp:*",
         "sts:GetCallerIdentity"
       ],
       "Resource": "*"

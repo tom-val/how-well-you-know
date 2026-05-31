@@ -15,6 +15,11 @@ variable "cors_allow_origins" {
   default = []
 }
 
+variable "authorizer_id" {
+  type    = string
+  default = null
+}
+
 variable "throttle_rate_limit" {
   type    = number
   default = 20

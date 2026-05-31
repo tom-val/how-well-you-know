@@ -14,8 +14,13 @@ The app is being rewritten around a pure domain layer with an AWS-serverless bac
   single aggregate item (JSON document) guarded by a version attribute for optimistic
   concurrency; users live in a separate table with a username GSI.
 - **API (`KnowMe.API/KnowMe.API`)** — .NET 10 minimal API hosted on AWS Lambda behind an
-  HTTP API Gateway v2. Feature-folder slices (Users, Games). Simple username-based auth via
-  the `X-User-Id` header; live state by polling `GET /v1/games/{id}`.
+  HTTP API Gateway v2. Feature-folder slices (Users, Games). Live state by polling
+  `GET /v1/games/{id}`.
+- **Auth (Cognito + Lambda authorizer)** — a Cognito user pool issues JWTs; a Node.js Lambda
+  authorizer (`KnowMe.API/authorizer`) validates them on every request and injects the verified
+  user id (the token `sub`) into the request context. The app trusts only that id, so callers
+  cannot impersonate each other. Domain users are keyed by the Cognito subject. For local dev
+  and tests there is no Cognito — an `X-User-Id` header stands in for the authorizer.
 - **Frontend (planned)** — a private S3 bucket served by a CloudFront distribution (OAC, SPA
   routing) is already provisioned by Terraform, ready for the frontend app. The API's CORS
   policy is wired to the CloudFront URL automatically.
@@ -31,6 +36,7 @@ The app is being rewritten around a pure domain layer with an AWS-serverless bac
 
 - .NET 10 (minimal API on AWS Lambda, ARM64)
 - DynamoDB
+- AWS Cognito + Node.js Lambda authorizer
 - Terraform
 - GitHub Actions
 - xUnit + FluentAssertions
@@ -78,8 +84,8 @@ It creates:
 | Deploy role | `knowme-github-actions` |
 
 The deploy role is scoped to what `terraform apply` and the deploy steps manage: the
-Terraform state, DynamoDB, Lambda, API Gateway, CloudWatch logs, the frontend S3 bucket,
-CloudFront, and IAM roles named `knowme-*`.
+Terraform state, DynamoDB, Lambda, API Gateway, Cognito, CloudWatch logs, the frontend S3
+bucket, CloudFront, and IAM roles named `knowme-*`.
 
 ### 2. Add the GitHub secret
 
@@ -124,9 +130,10 @@ the dev origin without a deploy via `-var='extra_cors_allowed_origins=["http://l
 
 | Method | Route | Purpose |
 | --- | --- | --- |
-| POST | `/v1/users` | Create or return a user by username |
-| GET | `/v1/users/{id}` | Get a user |
-| POST | `/v1/games` | Create a game (creator from `X-User-Id`) |
+| POST | `/v1/users` | Register the current user with a display name |
+| GET | `/v1/users/me` | Get the current user's profile |
+| GET | `/v1/users/{id}` | Get a user (e.g. another player) |
+| POST | `/v1/games` | Create a game (creator is the current user) |
 | GET | `/v1/games/{id}` | Get game state |
 | GET | `/v1/games/{id}/results` | Get the leaderboard and per-question results |
 | POST | `/v1/games/{id}/join` | Join a game |
@@ -136,6 +143,8 @@ the dev origin without a deploy via `-var='extra_cors_allowed_origins=["http://l
 | POST | `/v1/games/{id}/guesses` | Guess another player's answer |
 | POST | `/v1/games/{id}/advance` | Move past the review step to the next question |
 
-All game routes (except user creation) require the `X-User-Id` header.
+All routes except `GET /health` require an `Authorization: Bearer <Cognito JWT>` header.
+The identity is taken from the verified token — never from the client. (Locally, with no
+Cognito, an `X-User-Id: <guid>` header stands in.)
 
 Previously seen live here: https://quiz.valiunas.dev/

@@ -11,6 +11,15 @@ locals {
   )
 }
 
+# --- Auth (Cognito) ---
+
+module "cognito" {
+  source = "../../modules/cognito"
+
+  project_name = local.project_name
+  environment  = local.environment
+}
+
 # --- Persistence (DynamoDB) ---
 
 module "dynamodb" {
@@ -83,4 +92,16 @@ module "api_gateway" {
   environment        = local.environment
   lambda_invoke_arn  = module.lambda.invoke_arn
   cors_allow_origins = local.cors_allowed_origins
+  authorizer_id      = module.lambda_authorizer.authorizer_id
+}
+
+module "lambda_authorizer" {
+  source = "../../modules/lambda-authorizer"
+
+  project_name          = local.project_name
+  environment           = local.environment
+  cognito_user_pool_id  = module.cognito.user_pool_id
+  api_id                = module.api_gateway.api_id
+  api_execution_arn     = module.api_gateway.execution_arn
+  lambda_integration_id = module.api_gateway.lambda_integration_id
 }

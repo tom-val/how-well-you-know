@@ -33,7 +33,10 @@ jobs:
         working-directory: infra/environments/prod
     outputs:
       lambda_function_name: ${{ steps.outputs.outputs.lambda_function_name }}
+      authorizer_function_name: ${{ steps.outputs.outputs.authorizer_function_name }}
       api_endpoint: ${{ steps.outputs.outputs.api_endpoint }}
+      cognito_user_pool_id: ${{ steps.outputs.outputs.cognito_user_pool_id }}
+      cognito_client_id: ${{ steps.outputs.outputs.cognito_client_id }}
     steps:
       - uses: actions/checkout@v4
 
@@ -59,7 +62,10 @@ jobs:
         id: outputs
         run: |
           echo "lambda_function_name=$(terraform output -raw lambda_function_name)" >> "$GITHUB_OUTPUT"
+          echo "authorizer_function_name=$(terraform output -raw authorizer_function_name)" >> "$GITHUB_OUTPUT"
           echo "api_endpoint=$(terraform output -raw api_endpoint)" >> "$GITHUB_OUTPUT"
+          echo "cognito_user_pool_id=$(terraform output -raw cognito_user_pool_id)" >> "$GITHUB_OUTPUT"
+          echo "cognito_client_id=$(terraform output -raw cognito_client_id)" >> "$GITHUB_OUTPUT"
 
   backend:
     name: Deploy Backend
@@ -91,3 +97,39 @@ jobs:
           aws lambda update-function-code \
             --function-name ${{ needs.infra.outputs.lambda_function_name }} \
             --zip-file fileb://lambda.zip
+
+  authorizer:
+    name: Deploy Authorizer
+    needs: infra
+    runs-on: ubuntu-latest
+    environment: Prod
+    defaults:
+      run:
+        working-directory: KnowMe.API/authorizer
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: KnowMe.API/authorizer/package-lock.json
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: eu-central-1
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Package
+        run: zip -r ../authorizer.zip . -x '*.git*'
+
+      - name: Deploy Lambda
+        run: |
+          aws lambda update-function-code \
+            --function-name ${{ needs.infra.outputs.authorizer_function_name }} \
+            --zip-file fileb://../authorizer.zip

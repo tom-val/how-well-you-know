@@ -9,7 +9,15 @@ public class User
     public string? ProfileUrl { get; private set; }
     public DateTimeOffset CreatedAt { get; private set; }
 
-    public static Result<User> Create(string username)
+    public static Result<User> Create(string username) => Create(Guid.NewGuid(), username);
+
+    /// <summary>
+    /// Creates a user whose identity is supplied by an external identity provider
+    /// (e.g. the Cognito subject claim) rather than generated here.
+    /// </summary>
+    public static Result<User> Register(Guid id, string username) => Create(id, username);
+
+    private static Result<User> Create(Guid id, string username)
     {
         var errors = new List<ValidationError>();
 
@@ -28,7 +36,7 @@ public class User
 
         var user = new User
         {
-            Id = Guid.NewGuid(),
+            Id = id,
             UserName = username
         };
 

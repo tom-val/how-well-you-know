@@ -59,7 +59,17 @@ var app = builder.Build();
 // Middleware pipeline.
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseCors();
-app.UseMiddleware<UserContextMiddleware>();
+
+// Production trusts the verified user id from the Cognito Lambda authorizer; local
+// development and tests fall back to the X-User-Id header so no Cognito is required.
+if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("Testing"))
+{
+    app.UseMiddleware<UserContextMiddleware>();
+}
+else
+{
+    app.UseMiddleware<AuthorizerContextMiddleware>();
+}
 
 // Routes.
 app.MapGet("/health", () => Results.Ok(new { status = "healthy" }));

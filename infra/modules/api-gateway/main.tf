@@ -7,7 +7,7 @@ resource "aws_apigatewayv2_api" "api" {
   cors_configuration {
     allow_origins = var.cors_allow_origins
     allow_methods = ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"]
-    allow_headers = ["Content-Type", "X-User-Id"]
+    allow_headers = ["Content-Type", "Authorization"]
     max_age       = 3600
   }
 }
@@ -20,11 +20,20 @@ resource "aws_apigatewayv2_integration" "lambda" {
   payload_format_version = "2.0"
 }
 
-# All requests flow to the Lambda; the ASP.NET app handles routing. No authorizer
-# (simple username-based auth via the X-User-Id header).
+# All requests flow to the Lambda; the ASP.NET app handles routing. The Cognito
+# Lambda authorizer guards every route (public routes like /health are added separately).
 resource "aws_apigatewayv2_route" "default" {
+  api_id             = aws_apigatewayv2_api.api.id
+  route_key          = "$default"
+  target             = "integrations/${aws_apigatewayv2_integration.lambda.id}"
+  authorization_type = var.authorizer_id != null ? "CUSTOM" : "NONE"
+  authorizer_id      = var.authorizer_id
+}
+
+# Explicit OPTIONS route without the authorizer so CORS preflight is never blocked.
+resource "aws_apigatewayv2_route" "options" {
   api_id    = aws_apigatewayv2_api.api.id
-  route_key = "$default"
+  route_key = "OPTIONS /{proxy+}"
   target    = "integrations/${aws_apigatewayv2_integration.lambda.id}"
 }
 
