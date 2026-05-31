@@ -95,4 +95,52 @@ public class GameTests
         var gameStartResult = game.StartGame();
         gameStartResult.IsSuccess.Should().BeTrue();
     }
+
+    [Fact]
+    public void StartGame_WhenAlreadyStarted_ReturnsError()
+    {
+        var game = TestGameBuilder.StartedTwoPlayerGame(out _, out _);
+
+        var result = game.StartGame();
+
+        result.IsSuccess.Should().BeFalse();
+        result.Errors!.Should().Contain(e => e.Message == "Game has already been started");
+    }
+
+    [Fact]
+    public void AddPlayer_WhenDuplicate_ReturnsError()
+    {
+        var user = User.Create("player1").Value;
+        var game = Game.Create("test game", user).Value;
+
+        var result = game.AddPlayer(user);
+
+        result.IsSuccess.Should().BeFalse();
+        result.Errors!.First().Message.Should().Be("Cannot add duplicate player");
+    }
+
+    [Fact]
+    public void AddPlayer_AfterGameStarted_ReturnsError()
+    {
+        var game = TestGameBuilder.StartedTwoPlayerGame(out _, out _);
+
+        var result = game.AddPlayer(User.Create("late joiner").Value);
+
+        result.IsSuccess.Should().BeFalse();
+        result.Errors!.First().Message.Should().Be("Cannot add players after the game has started");
+    }
+
+    [Fact]
+    public void AddQuestion_AfterGameStarted_ReturnsError()
+    {
+        var game = TestGameBuilder.StartedTwoPlayerGame(out var player1, out _);
+
+        var variants = new Dictionary<char, string> { { 'A', "Yes" }, { 'B', "No" } };
+        var question = Question.Create("Late question?", false, variants, player1, game).Value;
+
+        var result = game.AddQuestion(question);
+
+        result.IsSuccess.Should().BeFalse();
+        result.Errors!.First().Message.Should().Be("Cannot add questions after the game has started");
+    }
 }

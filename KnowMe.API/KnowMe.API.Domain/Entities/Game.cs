@@ -14,6 +14,7 @@ public class Game
     public Guid CurrentQuestionId { get; private set; }
     public Guid CreatedByUser { get; private set; }
     public GameStatus Status { get; private set; }
+    public QuestionPhase CurrentQuestionPhase { get; private set; }
 
 
     public static Result<Game> Create(string name, User createdBy)
@@ -49,6 +50,14 @@ public class Game
     {
         var errors = new List<ValidationError>();
 
+        if (Status != GameStatus.Created)
+        {
+            errors.Add(new ValidationError
+            {
+                Message = "Cannot add players after the game has started"
+            });
+        }
+
         if (Players.Any(p => p.Id == player.Id))
         {
             errors.Add(new ValidationError
@@ -70,6 +79,20 @@ public class Game
 
     public Result<Game> RecordChoice(User user, List<QuestionVariant> selectedVariants)
     {
+        var stateError = EnsureAcceptingAnswers();
+        if (stateError is not null)
+        {
+            return Result<Game>.Failure([stateError]);
+        }
+
+        if (Players.All(p => p.Id != user.Id))
+        {
+            return Result<Game>.Failure([new ValidationError
+            {
+                Message = "User is not a player in this game"
+            }]);
+        }
+
         var currentQuestion = Questions.First(q => q.Id == CurrentQuestionId);
         var choiceResult = QuestionUserChoice.Create(user, currentQuestion, selectedVariants);
 
@@ -85,11 +108,42 @@ public class Game
             return Result<Game>.Failure(addChoiceResult.Errors!);
         }
 
+        MoveToReviewIfCurrentQuestionAnswered();
+
         return Result<Game>.Success(this);
     }
 
     public Result<Game> RecordGuess(User guessingUser, User choiceUser, List<QuestionVariant> selectedVariants)
     {
+        var stateError = EnsureAcceptingAnswers();
+        if (stateError is not null)
+        {
+            return Result<Game>.Failure([stateError]);
+        }
+
+        var errors = new List<ValidationError>();
+
+        if (guessingUser.Id == choiceUser.Id)
+        {
+            errors.Add(new ValidationError
+            {
+                Message = "User cannot guess their own answer"
+            });
+        }
+
+        if (Players.All(p => p.Id != guessingUser.Id) || Players.All(p => p.Id != choiceUser.Id))
+        {
+            errors.Add(new ValidationError
+            {
+                Message = "Both users must be players in this game"
+            });
+        }
+
+        if (errors.Count != 0)
+        {
+            return Result<Game>.Failure(errors);
+        }
+
         var currentQuestion = Questions.First(q => q.Id == CurrentQuestionId);
         var guessResult = QuestionUserGuess.Create(guessingUser, choiceUser, currentQuestion, selectedVariants);
 
@@ -105,42 +159,113 @@ public class Game
             return Result<Game>.Failure(addGuessResult.Errors!);
         }
 
-        AdvanceIfCurrentQuestionAnswered();
+        MoveToReviewIfCurrentQuestionAnswered();
 
         return Result<Game>.Success(this);
     }
 
-    public void AdvanceIfCurrentQuestionAnswered()
+    private void MoveToReviewIfCurrentQuestionAnswered()
     {
         var currentQuestion = Questions.First(q => q.Id == CurrentQuestionId);
 
         if (currentQuestion.Answered)
         {
-            var newQuestion = Questions.OrderBy(q => q.Id).FirstOrDefault(q => !q.Answered);
-
-            //If no new questions, game is finished
-            if (newQuestion is null)
-            {
-                Status = GameStatus.Ended;
-                //TODO Calculate total user scores
-                //TODO Add game ended domain event
-            }
-            else
-            {
-                CurrentQuestionId = newQuestion.Id;
-            }
+            CurrentQuestionPhase = QuestionPhase.Review;
+            //TODO Domain event that question entered review
         }
     }
 
-    public void AddQuestion(Question question)
+    public Result<Game> AdvanceToNextQuestion()
     {
-        //TODO Domain event that question added
+        var errors = new List<ValidationError>();
+
+        if (Status != GameStatus.Started)
+        {
+            errors.Add(new ValidationError
+            {
+                Message = "Game is not in progress"
+            });
+        }
+        else if (CurrentQuestionPhase != QuestionPhase.Review)
+        {
+            errors.Add(new ValidationError
+            {
+                Message = "Cannot advance until the current question is in review"
+            });
+        }
+
+        if (errors.Count != 0)
+        {
+            return Result<Game>.Failure(errors);
+        }
+
+        var newQuestion = Questions.OrderBy(q => q.Id).FirstOrDefault(q => !q.Answered);
+
+        //If no new questions, game is finished
+        if (newQuestion is null)
+        {
+            Status = GameStatus.Ended;
+            //TODO Calculate total user scores
+            //TODO Add game ended domain event
+        }
+        else
+        {
+            CurrentQuestionId = newQuestion.Id;
+            CurrentQuestionPhase = QuestionPhase.Answering;
+            //TODO Domain event that question advanced
+        }
+
+        return Result<Game>.Success(this);
+    }
+
+    private ValidationError? EnsureAcceptingAnswers()
+    {
+        if (Status != GameStatus.Started)
+        {
+            return new ValidationError
+            {
+                Message = "Game is not in progress"
+            };
+        }
+
+        if (CurrentQuestionPhase != QuestionPhase.Answering)
+        {
+            return new ValidationError
+            {
+                Message = "Current question is not accepting answers"
+            };
+        }
+
+        return null;
+    }
+
+    public Result<Game> AddQuestion(Question question)
+    {
+        if (Status != GameStatus.Created)
+        {
+            return Result<Game>.Failure([new ValidationError
+            {
+                Message = "Cannot add questions after the game has started"
+            }]);
+        }
+
         Questions.Add(question);
+
+        //TODO Domain event that question added
+        return Result<Game>.Success(this);
     }
 
     public Result<Game> StartGame()
     {
         var errors = new List<ValidationError>();
+
+        if (Status != GameStatus.Created)
+        {
+            errors.Add(new ValidationError
+            {
+                Message = "Game has already been started"
+            });
+        }
 
         if (Players.Count == 1)
         {
@@ -164,6 +289,7 @@ public class Game
         }
 
         Status = GameStatus.Started;
+        CurrentQuestionPhase = QuestionPhase.Answering;
         CurrentQuestionId = Questions.OrderBy(q => q.Id).First().Id;
 
 

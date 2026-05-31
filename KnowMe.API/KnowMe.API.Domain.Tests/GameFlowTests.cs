@@ -1,5 +1,6 @@
 using FluentAssertions;
 using KnowMe.API.Domain.Entities;
+using KnowMe.API.Domain.Enums;
 
 namespace KnowMe.API.Domain.Tests;
 
@@ -48,5 +49,63 @@ public class GameFlowTests
 
         //Start game
         game.StartGame();
+    }
+
+    [Fact]
+    public void AnsweringCurrentQuestion_MovesItToReviewWithoutAdvancing()
+    {
+        var game = TestGameBuilder.StartedTwoPlayerGame(out var player1, out var player2);
+        var firstQuestionId = game.CurrentQuestionId;
+
+        game.AnswerCurrentQuestion(player1, player2);
+
+        //Game pauses on a per-question review step instead of auto-advancing
+        game.Status.Should().Be(GameStatus.Started);
+        game.CurrentQuestionPhase.Should().Be(QuestionPhase.Review);
+        game.CurrentQuestionId.Should().Be(firstQuestionId);
+        game.CurrentQuestion().Answered.Should().BeTrue();
+    }
+
+    [Fact]
+    public void AdvanceToNextQuestion_WhenInReview_MovesToNextQuestionInAnsweringPhase()
+    {
+        var game = TestGameBuilder.StartedTwoPlayerGame(out var player1, out var player2);
+        var firstQuestionId = game.CurrentQuestionId;
+
+        game.AnswerCurrentQuestion(player1, player2);
+        var result = game.AdvanceToNextQuestion();
+
+        result.IsSuccess.Should().BeTrue();
+        game.Status.Should().Be(GameStatus.Started);
+        game.CurrentQuestionPhase.Should().Be(QuestionPhase.Answering);
+        game.CurrentQuestionId.Should().NotBe(firstQuestionId);
+    }
+
+    [Fact]
+    public void AdvanceToNextQuestion_WhenNotInReview_ReturnsError()
+    {
+        var game = TestGameBuilder.StartedTwoPlayerGame(out _, out _);
+
+        var result = game.AdvanceToNextQuestion();
+
+        result.IsSuccess.Should().BeFalse();
+        result.Errors!.First().Message.Should().Be("Cannot advance until the current question is in review");
+    }
+
+    [Fact]
+    public void AdvanceToNextQuestion_AfterLastQuestion_EndsGame()
+    {
+        var game = TestGameBuilder.StartedTwoPlayerGame(out var player1, out var player2);
+
+        //Question 1
+        game.AnswerCurrentQuestion(player1, player2);
+        game.AdvanceToNextQuestion();
+
+        //Question 2 (last)
+        game.AnswerCurrentQuestion(player1, player2);
+        var result = game.AdvanceToNextQuestion();
+
+        result.IsSuccess.Should().BeTrue();
+        game.Status.Should().Be(GameStatus.Ended);
     }
 }
