@@ -14,6 +14,10 @@ output "users_table_arn" {
   value = aws_dynamodb_table.users.arn
 }
 
-output "users_index_name" {
-  value = "user_name-index"
+output "memberships_table_name" {
+  value = aws_dynamodb_table.memberships.name
+}
+
+output "memberships_table_arn" {
+  value = aws_dynamodb_table.memberships.arn
 }

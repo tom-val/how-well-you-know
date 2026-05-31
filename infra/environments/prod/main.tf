@@ -81,7 +81,8 @@ module "lambda" {
   games_table_arn           = module.dynamodb.games_table_arn
   users_table_name          = module.dynamodb.users_table_name
   users_table_arn           = module.dynamodb.users_table_arn
-  users_index_name          = module.dynamodb.users_index_name
+  memberships_table_name    = module.dynamodb.memberships_table_name
+  memberships_table_arn     = module.dynamodb.memberships_table_arn
   cors_allowed_origins      = local.cors_allowed_origins
 }
 

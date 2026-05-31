@@ -12,7 +12,9 @@ The app is being rewritten around a pure domain layer with an AWS-serverless bac
   per-question answer/guess flow, review step, scoring) with a `Result<T>` validation pattern.
 - **Persistence (`KnowMe.API/KnowMe.API.Persistence`)** — DynamoDB. Each game is stored as a
   single aggregate item (JSON document) guarded by a version attribute for optimistic
-  concurrency; users live in a separate table with a username GSI.
+  concurrency; users live in a separate table. A memberships table holds an inverted index
+  (one row per player per game), written in the same transaction as the aggregate so
+  "list my games" works without scanning.
 - **API (`KnowMe.API/KnowMe.API`)** — .NET 10 minimal API hosted on AWS Lambda behind an
   HTTP API Gateway v2. Feature-folder slices (Users, Games). Live state by polling
   `GET /v1/games/{id}`.
@@ -134,6 +136,7 @@ the dev origin without a deploy via `-var='extra_cors_allowed_origins=["http://l
 | GET | `/v1/users/me` | Get the current user's profile |
 | GET | `/v1/users/{id}` | Get a user (e.g. another player) |
 | POST | `/v1/games` | Create a game (creator is the current user) |
+| GET | `/v1/games/mine` | List games the current user created or joined |
 | GET | `/v1/games/{id}` | Get game state |
 | GET | `/v1/games/{id}/results` | Get the leaderboard and per-question results |
 | POST | `/v1/games/{id}/join` | Join a game |

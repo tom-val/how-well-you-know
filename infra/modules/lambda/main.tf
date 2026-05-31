@@ -47,7 +47,7 @@ resource "aws_iam_role_policy" "dynamodb" {
       Resource = [
         var.games_table_arn,
         var.users_table_arn,
-        "${var.users_table_arn}/index/*",
+        var.memberships_table_arn,
       ]
     }]
   })
@@ -72,10 +72,10 @@ resource "aws_lambda_function" "api" {
   environment {
     variables = merge(
       {
-        ASPNETCORE_ENVIRONMENT             = "Production"
-        DynamoDb__GamesTableName           = var.games_table_name
-        DynamoDb__UsersTableName           = var.users_table_name
-        DynamoDb__UsersByUserNameIndexName = var.users_index_name
+        ASPNETCORE_ENVIRONMENT         = "Production"
+        DynamoDb__GamesTableName       = var.games_table_name
+        DynamoDb__UsersTableName       = var.users_table_name
+        DynamoDb__MembershipsTableName = var.memberships_table_name
       },
       { for i, origin in var.cors_allowed_origins : "Cors__AllowedOrigins__${i}" => origin }
     )

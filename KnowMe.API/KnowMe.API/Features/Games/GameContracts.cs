@@ -62,6 +62,15 @@ public record GameResponse(
         game.Questions.Select(QuestionResponse.From).ToList());
 }
 
+// --- Summaries (list my games) ---
+
+public record GameSummaryResponse(
+    Guid GameId,
+    string Name,
+    string Status,
+    Guid CreatedByUser,
+    DateTimeOffset CreatedAt);
+
 // --- Results ---
 
 public record ScoreResponse(Guid UserId, int TotalScore, int Rank);

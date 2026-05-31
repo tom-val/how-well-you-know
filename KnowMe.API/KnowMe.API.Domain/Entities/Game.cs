@@ -38,6 +38,7 @@ public class Game
         {
             Id = Guid.NewGuid(),
             Name = name,
+            CreatedAt = DateTimeOffset.UtcNow,
             CreatedByUser = createdBy.Id,
             Players = [createdBy],
             Status = GameStatus.Created

@@ -10,7 +10,6 @@ namespace KnowMe.API.Persistence.Repositories;
 public interface IUserRepository
 {
     Task<User?> GetAsync(Guid id, CancellationToken cancellationToken = default);
-    Task<User?> GetByUserNameAsync(string userName, CancellationToken cancellationToken = default);
     Task SaveAsync(User user, CancellationToken cancellationToken = default);
 }
 
@@ -23,13 +22,11 @@ public class UserRepository : IUserRepository
 
     private readonly IAmazonDynamoDB _dynamoDb;
     private readonly string _tableName;
-    private readonly string _userNameIndexName;
 
     public UserRepository(IAmazonDynamoDB dynamoDb, IOptions<DynamoDbSettings> settings)
     {
         _dynamoDb = dynamoDb;
         _tableName = settings.Value.UsersTableName;
-        _userNameIndexName = settings.Value.UsersByUserNameIndexName;
     }
 
     public async Task<User?> GetAsync(Guid id, CancellationToken cancellationToken = default)
@@ -41,23 +38,6 @@ public class UserRepository : IUserRepository
         }, cancellationToken);
 
         return response.Item is null || response.Item.Count == 0 ? null : ToDomain(response.Item);
-    }
-
-    public async Task<User?> GetByUserNameAsync(string userName, CancellationToken cancellationToken = default)
-    {
-        var response = await _dynamoDb.QueryAsync(new QueryRequest
-        {
-            TableName = _tableName,
-            IndexName = _userNameIndexName,
-            KeyConditionExpression = $"{UserNameAttribute} = :name",
-            ExpressionAttributeValues = new Dictionary<string, AttributeValue>
-            {
-                [":name"] = new() { S = userName }
-            },
-            Limit = 1
-        }, cancellationToken);
-
-        return response.Items is { Count: > 0 } ? ToDomain(response.Items[0]) : null;
     }
 
     public async Task SaveAsync(User user, CancellationToken cancellationToken = default)

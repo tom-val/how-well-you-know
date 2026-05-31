@@ -20,16 +20,22 @@ resource "aws_dynamodb_table" "users" {
     name = "id"
     type = "S"
   }
+}
+
+# Inverted index: one row per (user, game) so a player's games can be listed.
+resource "aws_dynamodb_table" "memberships" {
+  name         = "${var.project_name}-${var.environment}-memberships"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "user_id"
+  range_key    = "game_id"
 
   attribute {
-    name = "user_name"
+    name = "user_id"
     type = "S"
   }
 
-  # Lookup users by username for the create-or-return flow.
-  global_secondary_index {
-    name            = "user_name-index"
-    hash_key        = "user_name"
-    projection_type = "ALL"
+  attribute {
+    name = "game_id"
+    type = "S"
   }
 }

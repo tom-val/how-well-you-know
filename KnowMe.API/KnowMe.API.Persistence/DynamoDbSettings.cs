@@ -13,10 +13,10 @@ public class DynamoDbSettings
     public string UsersTableName { get; set; } = "knowme-users";
 
     /// <summary>
-    /// Name of the global secondary index on the users table that maps username -> user.
+    /// Inverted index of game memberships keyed by user, so a player's games can be listed.
     /// </summary>
     [Required]
-    public string UsersByUserNameIndexName { get; set; } = "user_name-index";
+    public string MembershipsTableName { get; set; } = "knowme-memberships";
 
     /// <summary>
     /// Optional service URL override for pointing at DynamoDB Local during development.

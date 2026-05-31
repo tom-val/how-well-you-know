@@ -13,6 +13,7 @@ public static class GameEndpoints
         var group = app.MapGroup("/v1/games");
 
         group.MapPost("/", CreateGame);
+        group.MapGet("/mine", ListMyGames);
         group.MapGet("/{id:guid}", GetGame);
         group.MapGet("/{id:guid}/results", GetResults);
         group.MapPost("/{id:guid}/join", JoinGame);
@@ -53,6 +54,22 @@ public static class GameEndpoints
         return game is null
             ? Results.NotFound(new { error = "Game not found." })
             : Results.Ok(GameResponse.From(game));
+    }
+
+    // Lists every game the current user has created or joined (newest first).
+    private static async Task<IResult> ListMyGames(
+        IGameRepository games,
+        HttpContext context,
+        CancellationToken cancellationToken)
+    {
+        var memberships = await games.ListForUserAsync(context.GetUserId(), cancellationToken);
+
+        var summaries = memberships
+            .OrderByDescending(m => m.CreatedAt)
+            .Select(m => new GameSummaryResponse(m.GameId, m.Name, m.Status, m.CreatedByUser, m.CreatedAt))
+            .ToList();
+
+        return Results.Ok(summaries);
     }
 
     private static async Task<IResult> GetResults(Guid id, IGameRepository games, CancellationToken cancellationToken)
