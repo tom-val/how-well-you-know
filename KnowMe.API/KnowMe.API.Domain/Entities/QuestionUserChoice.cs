@@ -51,4 +51,16 @@ public class QuestionUserChoice
 
         return Result<QuestionUserChoice>.Success(choice);
     }
+
+    /// <summary>
+    /// Reconstructs a choice from persisted state. For use by the persistence layer only.
+    /// </summary>
+    internal static QuestionUserChoice Rehydrate(Guid id, Guid userId, Guid questionId, List<Guid> selectedVariantsIds) =>
+        new()
+        {
+            Id = id,
+            UserId = userId,
+            QuestionId = questionId,
+            SelectedVariantsIds = selectedVariantsIds
+        };
 }

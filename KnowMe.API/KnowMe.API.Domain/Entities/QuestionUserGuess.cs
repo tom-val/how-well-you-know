@@ -45,4 +45,18 @@ public class QuestionUserGuess
 
         return Result<QuestionUserGuess>.Success(choice);
     }
+
+    /// <summary>
+    /// Reconstructs a guess from persisted state. For use by the persistence layer only.
+    /// </summary>
+    internal static QuestionUserGuess Rehydrate(
+        Guid id, Guid guessingUserId, Guid choiceUserId, Guid questionId, List<Guid> selectedVariantsIds) =>
+        new()
+        {
+            Id = id,
+            GuessingUserId = guessingUserId,
+            ChoiceUserId = choiceUserId,
+            QuestionId = questionId,
+            SelectedVariantsIds = selectedVariantsIds
+        };
 }

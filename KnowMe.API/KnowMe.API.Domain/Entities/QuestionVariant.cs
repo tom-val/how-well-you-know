@@ -43,4 +43,16 @@ public class QuestionVariant
     {
         QuestionId = question.Id;
     }
+
+    /// <summary>
+    /// Reconstructs a variant from persisted state. For use by the persistence layer only.
+    /// </summary>
+    internal static QuestionVariant Rehydrate(Guid id, Guid questionId, string text, char notation) =>
+        new()
+        {
+            Id = id,
+            QuestionId = questionId,
+            Text = text,
+            Notation = notation
+        };
 }

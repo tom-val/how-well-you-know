@@ -34,4 +34,17 @@ public class User
 
         return Result<User>.Success(user);
     }
+
+    /// <summary>
+    /// Reconstructs a user from persisted state without running creation validation.
+    /// For use by the persistence layer only.
+    /// </summary>
+    internal static User Rehydrate(Guid id, string userName, string? profileUrl, DateTimeOffset createdAt) =>
+        new()
+        {
+            Id = id,
+            UserName = userName,
+            ProfileUrl = profileUrl,
+            CreatedAt = createdAt
+        };
 }

@@ -205,7 +205,7 @@ public class Game
         if (newQuestion is null)
         {
             Status = GameStatus.Ended;
-            //TODO Calculate total user scores
+            //Final scores are available on demand via GetResults()
             //TODO Add game ended domain event
         }
         else
@@ -216,6 +216,28 @@ public class Game
         }
 
         return Result<Game>.Success(this);
+    }
+
+    /// <summary>
+    /// Aggregates every answered question into a per-player total score and ranking.
+    /// Works mid-game (counting only answered questions) and as the final result once ended.
+    /// </summary>
+    public GameResult GetResults()
+    {
+        var totals = Players.ToDictionary(p => p.Id, _ => 0);
+
+        foreach (var question in Questions.Where(q => q.Answered))
+        {
+            foreach (var userResult in question.GetUserResults().Value)
+            {
+                if (totals.ContainsKey(userResult.UserId))
+                {
+                    totals[userResult.UserId] += userResult.TotalScore;
+                }
+            }
+        }
+
+        return GameResult.Create(Id, totals.Select(kvp => (kvp.Key, kvp.Value)));
     }
 
     private ValidationError? EnsureAcceptingAnswers()
@@ -295,5 +317,41 @@ public class Game
 
         //TODO Domain event that game started
         return Result<Game>.Success(this);
+    }
+
+    /// <summary>
+    /// Reconstructs a game aggregate from persisted state without running creation validation,
+    /// wiring each question's owning-game back-reference. For use by the persistence layer only.
+    /// </summary>
+    internal static Game Rehydrate(
+        Guid id,
+        string name,
+        DateTimeOffset createdAt,
+        List<User> players,
+        List<Question> questions,
+        Guid currentQuestionId,
+        Guid createdByUser,
+        GameStatus status,
+        QuestionPhase currentQuestionPhase)
+    {
+        var game = new Game
+        {
+            Id = id,
+            Name = name,
+            CreatedAt = createdAt,
+            Players = players,
+            Questions = questions,
+            CurrentQuestionId = currentQuestionId,
+            CreatedByUser = createdByUser,
+            Status = status,
+            CurrentQuestionPhase = currentQuestionPhase
+        };
+
+        foreach (var question in questions)
+        {
+            question.AttachGame(game);
+        }
+
+        return game;
     }
 }

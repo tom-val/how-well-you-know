@@ -181,6 +181,44 @@ public class Question
 
         return Result<Question>.Success(question);
     }
+
+    /// <summary>
+    /// Reconstructs a question from persisted state. The owning <see cref="Game"/> is wired up
+    /// separately via <see cref="AttachGame"/> once the aggregate is assembled.
+    /// For use by the persistence layer only.
+    /// </summary>
+    internal static Question Rehydrate(
+        Guid id,
+        string text,
+        bool multipleAnswers,
+        Guid createdByUser,
+        DateTimeOffset createdAt,
+        Guid gameId,
+        List<QuestionVariant> answerVariants,
+        List<QuestionUserChoice> userChoices,
+        List<QuestionUserGuess> userGuesses) =>
+        new()
+        {
+            Id = id,
+            Text = text,
+            MultipleAnswers = multipleAnswers,
+            CreatedByUser = createdByUser,
+            CreatedAt = createdAt,
+            GameId = gameId,
+            AnswerVariants = answerVariants,
+            UserChoices = userChoices,
+            UserGuesses = userGuesses
+        };
+
+    /// <summary>
+    /// Wires the owning game back-reference after the aggregate has been reconstructed,
+    /// so <see cref="Answered"/> can read the player count. Persistence layer only.
+    /// </summary>
+    internal void AttachGame(Game game)
+    {
+        Game = game;
+        GameId = game.Id;
+    }
 }
 
 public record UserGuessResult(Guid GuessingUser, Guid ChoiceUser, int Score, List<Guid> NotSelectedChoices, List<Guid> ShouldNotBeSelectedChoices);
