@@ -16,8 +16,14 @@ The app is being rewritten around a pure domain layer with an AWS-serverless bac
   (one row per player per game), written in the same transaction as the aggregate so
   "list my games" works without scanning.
 - **API (`KnowMe.API/KnowMe.API`)** — .NET 10 minimal API hosted on AWS Lambda behind an
-  HTTP API Gateway v2. Feature-folder slices (Users, Games). Live state by polling
-  `GET /v1/games/{id}`.
+  HTTP API Gateway v2. Feature-folder slices (Users, Games). After every state-changing
+  endpoint it broadcasts a lightweight `game-changed` signal to subscribed clients (see
+  real-time below), with a slow client-side poll as a safety net.
+- **Real-time (`infra/modules/websocket` + `KnowMe.API/ws-connections`)** — an API Gateway
+  WebSocket API with a Node connections Lambda (`$connect` validates the Cognito token,
+  `subscribe` records the game id) tracking open sockets in a DynamoDB connections table
+  (GSI on `game_id`, TTL cleanup). The API Lambda pushes `game-changed` via the API Gateway
+  Management API; the SPA invalidates its cache and refetches instantly instead of polling.
 - **Auth (Cognito + Lambda authorizer)** — a Cognito user pool issues JWTs; a Node.js Lambda
   authorizer (`KnowMe.API/authorizer`) validates them on every request and injects the verified
   user id (the token `sub`) into the request context. The app trusts only that id, so callers
@@ -28,11 +34,11 @@ The app is being rewritten around a pure domain layer with an AWS-serverless bac
   that attaches the access token, and a lobby (create / join / list-my-games). Served from a
   private S3 bucket via CloudFront (OAC, SPA routing); the API's CORS is wired to the CloudFront
   URL automatically. Gameplay screens (question setup, answer/guess/review, results) are next.
-- **Infrastructure (`infra/`)** — modular Terraform (DynamoDB, Lambda, API Gateway, S3 +
-  CloudFront), composed in `infra/environments/prod` with an S3 state backend.
+- **Infrastructure (`infra/`)** — modular Terraform (DynamoDB, Lambda, API Gateway, WebSocket,
+  Cognito, S3 + CloudFront), composed in `infra/environments/prod` with an S3 state backend.
 - **CI/CD (`.github/workflows/deploy-prod.yml`)** — on push to `main`: build & test, `terraform
-  apply`, then in parallel publish the .NET 10 `linux-arm64` Lambda, the Node.js authorizer, and
-  the frontend (build → S3 sync → CloudFront invalidation).
+  apply`, then in parallel publish the .NET 10 `linux-arm64` Lambda, the Node.js authorizer, the
+  WebSocket connections Lambda, and the frontend (build → S3 sync → CloudFront invalidation).
 
 > The legacy combined API + React UI lives in `HowWellYouKnow.API/` and is being retired.
 

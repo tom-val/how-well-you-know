@@ -48,7 +48,26 @@ resource "aws_iam_role_policy" "dynamodb" {
         var.games_table_arn,
         var.users_table_arn,
         var.memberships_table_arn,
+        var.connections_table_arn,
+        "${var.connections_table_arn}/index/*",
       ]
+    }]
+  })
+}
+
+# Allow the API to push "game-changed" signals to live WebSocket connections.
+resource "aws_iam_role_policy" "manage_connections" {
+  count = var.ws_manage_connections_arn == "" ? 0 : 1
+
+  name = "${var.project_name}-${var.environment}-lambda-ws"
+  role = aws_iam_role.lambda_execution.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect   = "Allow"
+      Action   = "execute-api:ManageConnections"
+      Resource = var.ws_manage_connections_arn
     }]
   })
 }
@@ -76,6 +95,8 @@ resource "aws_lambda_function" "api" {
         DynamoDb__GamesTableName       = var.games_table_name
         DynamoDb__UsersTableName       = var.users_table_name
         DynamoDb__MembershipsTableName = var.memberships_table_name
+        DynamoDb__ConnectionsTableName = var.connections_table_name
+        WebSocket__ManagementEndpoint  = var.ws_management_endpoint
         OpenAi__ApiKey                 = var.openai_api_key
       },
       { for i, origin in var.cors_allowed_origins : "Cors__AllowedOrigins__${i}" => origin }

@@ -34,6 +34,26 @@ variable "memberships_table_arn" {
   type = string
 }
 
+variable "connections_table_name" {
+  type = string
+}
+
+variable "connections_table_arn" {
+  type = string
+}
+
+# https:// endpoint used to push messages to WebSocket connections. Empty disables broadcasting.
+variable "ws_management_endpoint" {
+  type    = string
+  default = ""
+}
+
+# IAM ARN scope for execute-api:ManageConnections.
+variable "ws_manage_connections_arn" {
+  type    = string
+  default = ""
+}
+
 variable "cors_allowed_origins" {
   type    = list(string)
   default = []

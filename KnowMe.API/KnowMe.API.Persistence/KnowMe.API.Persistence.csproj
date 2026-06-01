@@ -9,7 +9,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="AWSSDK.ApiGatewayManagementApi" Version="4.0.2.34" />
     <PackageReference Include="AWSSDK.DynamoDBv2" Version="4.0.18.6" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.8" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="10.0.8" />
   </ItemGroup>
 

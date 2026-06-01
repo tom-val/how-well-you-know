@@ -11,7 +11,7 @@ export function ActiveView({ game }: { game: Game }) {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  const resultsQuery = useQuery({ queryKey: ["results", game.id], queryFn: () => getResults(game.id), refetchInterval: 4000 });
+  const resultsQuery = useQuery({ queryKey: ["results", game.id], queryFn: () => getResults(game.id), refetchInterval: 30000 });
   const scores = new Map((resultsQuery.data?.overall ?? []).map((s) => [s.userId, s.totalScore]));
 
   const nameOf = (id: string) => (id === user?.sub ? t.you : game.players.find((p) => p.id === id)?.userName ?? "?");

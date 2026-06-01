@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { getGame } from "../../api/gamesApi";
+import { useGameSocket } from "../../api/useGameSocket";
 import { useLang } from "../../i18n/lang";
 import { Icon, Spinner } from "../../components/ui";
 import { RoomView } from "./RoomView";
@@ -13,10 +14,12 @@ export default function GamePage() {
   const { id = "" } = useParams();
   const navigate = useNavigate();
 
+  // Real-time updates arrive over the socket; the interval is just a slow safety net.
+  useGameSocket(id);
   const gameQuery = useQuery({
     queryKey: ["game", id],
     queryFn: () => getGame(id),
-    refetchInterval: (query) => (query.state.data?.status === "Ended" ? false : 4000),
+    refetchInterval: (query) => (query.state.data?.status === "Ended" ? false : 30000),
   });
 
   // If the game starts while we're sitting in the room, drop straight into play.

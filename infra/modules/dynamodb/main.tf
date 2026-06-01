@@ -39,3 +39,33 @@ resource "aws_dynamodb_table" "memberships" {
     type = "S"
   }
 }
+
+# Live WebSocket connections. One row per open socket; the GSI lets the API broadcast
+# a "game-changed" signal to every connection subscribed to a given game. A TTL on
+# `ttl` reaps rows that survive an ungraceful disconnect.
+resource "aws_dynamodb_table" "connections" {
+  name         = "${var.project_name}-${var.environment}-connections"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "connection_id"
+
+  attribute {
+    name = "connection_id"
+    type = "S"
+  }
+
+  attribute {
+    name = "game_id"
+    type = "S"
+  }
+
+  global_secondary_index {
+    name            = "game_id-index"
+    hash_key        = "game_id"
+    projection_type = "KEYS_ONLY"
+  }
+
+  ttl {
+    attribute_name = "ttl"
+    enabled        = true
+  }
+}

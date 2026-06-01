@@ -30,6 +30,14 @@ output "authorizer_function_name" {
   value = module.lambda_authorizer.function_name
 }
 
+output "ws_connect_url" {
+  value = module.websocket.ws_connect_url
+}
+
+output "ws_connections_function_name" {
+  value = module.websocket.connections_function_name
+}
+
 output "cognito_user_pool_id" {
   value = module.cognito.user_pool_id
 }

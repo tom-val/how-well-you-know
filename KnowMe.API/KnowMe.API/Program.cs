@@ -1,3 +1,4 @@
+using Amazon.ApiGatewayManagementApi;
 using Amazon.DynamoDBv2;
 using Amazon.Lambda.AspNetCoreServer;
 using FluentValidation;
@@ -5,6 +6,7 @@ using KnowMe.API.Features.Games;
 using KnowMe.API.Features.Suggestions;
 using KnowMe.API.Features.Users;
 using KnowMe.API.Persistence;
+using KnowMe.API.Persistence.Notifications;
 using KnowMe.API.Persistence.Repositories;
 using KnowMe.API.Shared.Middleware;
 using Microsoft.Extensions.Options;
@@ -54,6 +56,25 @@ builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 // Repositories.
 builder.Services.AddScoped<IGameRepository, GameRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+
+// Real-time notifications: broadcast game-changed over WebSockets when an endpoint is
+// configured; otherwise a no-op (local dev / tests just rely on the frontend's safety poll).
+builder.Services
+    .AddOptions<WebSocketSettings>()
+    .Bind(builder.Configuration.GetSection(WebSocketSettings.SectionName));
+
+var wsEndpoint = builder.Configuration[$"{WebSocketSettings.SectionName}:ManagementEndpoint"];
+if (string.IsNullOrEmpty(wsEndpoint))
+{
+    builder.Services.AddSingleton<IGameNotifier, NoOpGameNotifier>();
+}
+else
+{
+    builder.Services.AddSingleton<IAmazonApiGatewayManagementApi>(_ =>
+        new AmazonApiGatewayManagementApiClient(
+            new AmazonApiGatewayManagementApiConfig { ServiceURL = wsEndpoint }));
+    builder.Services.AddSingleton<IGameNotifier, WebSocketGameNotifier>();
+}
 
 // AI question suggestions (inline OpenAI call; short timeout so a slow provider can't
 // hold the request near the API Gateway cap — the client falls back to the static bank).

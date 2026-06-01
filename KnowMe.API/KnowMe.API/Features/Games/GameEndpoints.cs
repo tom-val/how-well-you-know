@@ -1,5 +1,6 @@
 using FluentValidation;
 using KnowMe.API.Domain.Entities;
+using KnowMe.API.Persistence.Notifications;
 using KnowMe.API.Persistence.Repositories;
 using KnowMe.API.Shared;
 using KnowMe.API.Shared.Extensions;
@@ -89,6 +90,7 @@ public static class GameEndpoints
         Guid id,
         IGameRepository games,
         IUserRepository users,
+        IGameNotifier notifier,
         HttpContext context,
         CancellationToken cancellationToken)
     {
@@ -105,6 +107,7 @@ public static class GameEndpoints
             return ApiResults.DomainValidationProblem(result.Errors!);
 
         await games.SaveAsync(game, cancellationToken);
+        await notifier.GameChangedAsync(game.Id, cancellationToken);
         return Results.Ok(GameResponse.From(game, context.GetUserId()));
     }
 
@@ -114,6 +117,7 @@ public static class GameEndpoints
         IValidator<AddQuestionRequest> validator,
         IGameRepository games,
         IUserRepository users,
+        IGameNotifier notifier,
         HttpContext context,
         CancellationToken cancellationToken)
     {
@@ -140,6 +144,7 @@ public static class GameEndpoints
             return ApiResults.DomainValidationProblem(addResult.Errors!);
 
         await games.SaveAsync(game, cancellationToken);
+        await notifier.GameChangedAsync(game.Id, cancellationToken);
         return Results.Created($"/v1/games/{game.Id}", QuestionResponse.From(questionResult.Value));
     }
 
@@ -147,6 +152,7 @@ public static class GameEndpoints
         Guid id,
         Guid questionId,
         IGameRepository games,
+        IGameNotifier notifier,
         HttpContext context,
         CancellationToken cancellationToken)
     {
@@ -159,12 +165,14 @@ public static class GameEndpoints
             return ApiResults.DomainValidationProblem(result.Errors!);
 
         await games.SaveAsync(game, cancellationToken);
+        await notifier.GameChangedAsync(game.Id, cancellationToken);
         return Results.Ok(GameResponse.From(game, context.GetUserId()));
     }
 
     private static async Task<IResult> StartGame(
         Guid id,
         IGameRepository games,
+        IGameNotifier notifier,
         HttpContext context,
         CancellationToken cancellationToken)
     {
@@ -177,6 +185,7 @@ public static class GameEndpoints
             return ApiResults.DomainValidationProblem(result.Errors!);
 
         await games.SaveAsync(game, cancellationToken);
+        await notifier.GameChangedAsync(game.Id, cancellationToken);
         return Results.Ok(GameResponse.From(game, context.GetUserId()));
     }
 
@@ -186,6 +195,7 @@ public static class GameEndpoints
         IValidator<RecordChoiceRequest> validator,
         IGameRepository games,
         IUserRepository users,
+        IGameNotifier notifier,
         HttpContext context,
         CancellationToken cancellationToken)
     {
@@ -209,6 +219,7 @@ public static class GameEndpoints
             return ApiResults.DomainValidationProblem(result.Errors!);
 
         await games.SaveAsync(game, cancellationToken);
+        await notifier.GameChangedAsync(game.Id, cancellationToken);
         return Results.Ok(GameResponse.From(game, context.GetUserId()));
     }
 
@@ -218,6 +229,7 @@ public static class GameEndpoints
         IValidator<RecordGuessRequest> validator,
         IGameRepository games,
         IUserRepository users,
+        IGameNotifier notifier,
         HttpContext context,
         CancellationToken cancellationToken)
     {
@@ -245,12 +257,14 @@ public static class GameEndpoints
             return ApiResults.DomainValidationProblem(result.Errors!);
 
         await games.SaveAsync(game, cancellationToken);
+        await notifier.GameChangedAsync(game.Id, cancellationToken);
         return Results.Ok(GameResponse.From(game, context.GetUserId()));
     }
 
     private static async Task<IResult> AdvanceQuestion(
         Guid id,
         IGameRepository games,
+        IGameNotifier notifier,
         HttpContext context,
         CancellationToken cancellationToken)
     {
@@ -263,6 +277,7 @@ public static class GameEndpoints
             return ApiResults.DomainValidationProblem(result.Errors!);
 
         await games.SaveAsync(game, cancellationToken);
+        await notifier.GameChangedAsync(game.Id, cancellationToken);
         return Results.Ok(GameResponse.From(game, context.GetUserId()));
     }
 

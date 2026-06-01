@@ -95,8 +95,24 @@ module "lambda" {
   users_table_arn           = module.dynamodb.users_table_arn
   memberships_table_name    = module.dynamodb.memberships_table_name
   memberships_table_arn     = module.dynamodb.memberships_table_arn
+  connections_table_name    = module.dynamodb.connections_table_name
+  connections_table_arn     = module.dynamodb.connections_table_arn
+  ws_management_endpoint    = module.websocket.management_endpoint
+  ws_manage_connections_arn = module.websocket.manage_connections_arn
   cors_allowed_origins      = local.cors_allowed_origins
   openai_api_key            = var.openai_api_key
+}
+
+# --- Real-time (API Gateway WebSocket) ---
+
+module "websocket" {
+  source = "../../modules/websocket"
+
+  project_name           = local.project_name
+  environment            = local.environment
+  cognito_user_pool_id   = module.cognito.user_pool_id
+  connections_table_name = module.dynamodb.connections_table_name
+  connections_table_arn  = module.dynamodb.connections_table_arn
 }
 
 module "api_gateway" {

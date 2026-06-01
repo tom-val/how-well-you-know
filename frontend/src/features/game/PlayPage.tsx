@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useSnackbar } from "notistack";
 import { advanceQuestion, getGame, getResults, recordChoice, recordGuess } from "../../api/gamesApi";
 import type { Game, Question } from "../../api/gamesApi";
+import { useGameSocket } from "../../api/useGameSocket";
 import { useLang } from "../../i18n/lang";
 import { useAuth } from "../../hooks/useAuth";
 import { Avatar, Icon, ScreenHead, Spinner, playerColor } from "../../components/ui";
@@ -17,11 +18,13 @@ export default function PlayPage() {
   const queryClient = useQueryClient();
   const { enqueueSnackbar } = useSnackbar();
 
-  const gameQuery = useQuery({ queryKey: ["game", id], queryFn: () => getGame(id), refetchInterval: 3500 });
+  // Real-time updates arrive over the socket; intervals are slow safety nets.
+  useGameSocket(id);
+  const gameQuery = useQuery({ queryKey: ["game", id], queryFn: () => getGame(id), refetchInterval: 30000 });
   const game = gameQuery.data;
 
   // live scores for the header scoreboard (results works mid-game)
-  const scoresQuery = useQuery({ queryKey: ["results", id], queryFn: () => getResults(id), refetchInterval: 4000 });
+  const scoresQuery = useQuery({ queryKey: ["results", id], queryFn: () => getResults(id), refetchInterval: 30000 });
   const scoreOf = (uid: string) => scoresQuery.data?.overall.find((s) => s.userId === uid)?.totalScore ?? 0;
 
   const refresh = () => queryClient.invalidateQueries({ queryKey: ["game", id] });

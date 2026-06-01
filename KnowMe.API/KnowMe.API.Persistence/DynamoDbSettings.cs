@@ -19,6 +19,12 @@ public class DynamoDbSettings
     public string MembershipsTableName { get; set; } = "knowme-memberships";
 
     /// <summary>
+    /// Live WebSocket connections, with a GSI on game_id for broadcasting game-changed signals.
+    /// </summary>
+    [Required]
+    public string ConnectionsTableName { get; set; } = "knowme-connections";
+
+    /// <summary>
     /// Optional service URL override for pointing at DynamoDB Local during development.
     /// </summary>
     public string? ServiceUrl { get; set; }
