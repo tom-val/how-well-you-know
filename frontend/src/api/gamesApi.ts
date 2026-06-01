@@ -25,8 +25,20 @@ export interface Game {
   currentQuestionPhase: QuestionPhase;
   currentQuestionId: string;
   createdByUser: string;
-  players: { id: string; userName: string; profileUrl: string | null }[];
+  players: Player[];
   questions: Question[];
+  viewer: ViewerState | null;
+}
+
+export interface Player {
+  id: string;
+  userName: string;
+  profileUrl: string | null;
+}
+
+export interface ViewerState {
+  hasAnswered: boolean;
+  guessedUserIds: string[];
 }
 
 export interface GameSummary {

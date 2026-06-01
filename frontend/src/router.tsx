@@ -9,6 +9,7 @@ const Login = lazy(() => import("./features/auth/Login"));
 const Register = lazy(() => import("./features/auth/Register"));
 const LobbyPage = lazy(() => import("./features/lobby/LobbyPage"));
 const GamePage = lazy(() => import("./features/game/GamePage"));
+const JoinByLinkPage = lazy(() => import("./features/game/JoinByLinkPage"));
 
 function Lazy({ children }: { children: ReactNode }) {
   return <Suspense fallback={<Spinner />}>{children}</Suspense>;
@@ -26,6 +27,7 @@ export const router = createBrowserRouter([
     ),
     children: [
       { index: true, element: <Lazy><LobbyPage /></Lazy> },
+      { path: "join/:id", element: <Lazy><JoinByLinkPage /></Lazy> },
       { path: "games/:id", element: <Lazy><GamePage /></Lazy> },
     ],
   },

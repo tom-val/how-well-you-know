@@ -43,6 +43,37 @@
     "back": "Atgal",
     "playComingSoon": "Žaidimo ekranai netrukus."
   },
+  "join": {
+    "joining": "Jungiamasi prie žaidimo…",
+    "couldNotJoin": "Nepavyko prisijungti"
+  },
+  "play": {
+    "shareHint": "Pasidalink šia nuoroda, kad kiti galėtų prisijungti:",
+    "copyLink": "Kopijuoti nuorodą",
+    "linkCopied": "Nuoroda nukopijuota",
+    "noQuestionsYet": "Dar nėra klausimų.",
+    "addQuestion": "Pridėti klausimą",
+    "questionText": "Klausimas",
+    "variant": "Variantas {{notation}}",
+    "addVariant": "Pridėti variantą",
+    "multipleAnswers": "Galimi keli atsakymai",
+    "saveQuestion": "Išsaugoti klausimą",
+    "start": "Pradėti žaidimą",
+    "startHint": "Reikia bent 2 žaidėjų ir 2 klausimų.",
+    "yourAnswer": "Tavo atsakymas",
+    "answer": "Atsakyti",
+    "guessIntro": "Atspėk, ką pasirinko kiti žaidėjai.",
+    "guessFor": "Ką pasirinko {{name}}?",
+    "guess": "Spėti",
+    "waitingOthers": "Laukiama kitų žaidėjų…",
+    "review": "Klausimo apžvalga",
+    "points": "{{count}} tšk.",
+    "guessedFor": "Spėjo apie {{name}}",
+    "next": "Kitas klausimas",
+    "finish": "Baigti žaidimą",
+    "results": "Rezultatai",
+    "backToLobby": "Atgal į žaidimus"
+  },
   "status": {
     "Created": "Kuriamas",
     "Started": "Vyksta",

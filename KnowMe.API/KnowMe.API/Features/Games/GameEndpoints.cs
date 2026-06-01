@@ -45,15 +45,19 @@ public static class GameEndpoints
             return ApiResults.DomainValidationProblem(result.Errors!);
 
         await games.SaveAsync(result.Value, cancellationToken);
-        return Results.Created($"/v1/games/{result.Value.Id}", GameResponse.From(result.Value));
+        return Results.Created($"/v1/games/{result.Value.Id}", GameResponse.From(result.Value, context.GetUserId()));
     }
 
-    private static async Task<IResult> GetGame(Guid id, IGameRepository games, CancellationToken cancellationToken)
+    private static async Task<IResult> GetGame(
+        Guid id,
+        IGameRepository games,
+        HttpContext context,
+        CancellationToken cancellationToken)
     {
         var game = await games.GetAsync(id, cancellationToken);
         return game is null
             ? Results.NotFound(new { error = "Game not found." })
-            : Results.Ok(GameResponse.From(game));
+            : Results.Ok(GameResponse.From(game, context.GetUserId()));
     }
 
     // Lists every game the current user has created or joined (newest first).
@@ -100,7 +104,7 @@ public static class GameEndpoints
             return ApiResults.DomainValidationProblem(result.Errors!);
 
         await games.SaveAsync(game, cancellationToken);
-        return Results.Ok(GameResponse.From(game));
+        return Results.Ok(GameResponse.From(game, context.GetUserId()));
     }
 
     private static async Task<IResult> AddQuestion(
@@ -138,7 +142,11 @@ public static class GameEndpoints
         return Results.Created($"/v1/games/{game.Id}", QuestionResponse.From(questionResult.Value));
     }
 
-    private static async Task<IResult> StartGame(Guid id, IGameRepository games, CancellationToken cancellationToken)
+    private static async Task<IResult> StartGame(
+        Guid id,
+        IGameRepository games,
+        HttpContext context,
+        CancellationToken cancellationToken)
     {
         var game = await games.GetAsync(id, cancellationToken);
         if (game is null)
@@ -149,7 +157,7 @@ public static class GameEndpoints
             return ApiResults.DomainValidationProblem(result.Errors!);
 
         await games.SaveAsync(game, cancellationToken);
-        return Results.Ok(GameResponse.From(game));
+        return Results.Ok(GameResponse.From(game, context.GetUserId()));
     }
 
     private static async Task<IResult> RecordChoice(
@@ -181,7 +189,7 @@ public static class GameEndpoints
             return ApiResults.DomainValidationProblem(result.Errors!);
 
         await games.SaveAsync(game, cancellationToken);
-        return Results.Ok(GameResponse.From(game));
+        return Results.Ok(GameResponse.From(game, context.GetUserId()));
     }
 
     private static async Task<IResult> RecordGuess(
@@ -217,10 +225,14 @@ public static class GameEndpoints
             return ApiResults.DomainValidationProblem(result.Errors!);
 
         await games.SaveAsync(game, cancellationToken);
-        return Results.Ok(GameResponse.From(game));
+        return Results.Ok(GameResponse.From(game, context.GetUserId()));
     }
 
-    private static async Task<IResult> AdvanceQuestion(Guid id, IGameRepository games, CancellationToken cancellationToken)
+    private static async Task<IResult> AdvanceQuestion(
+        Guid id,
+        IGameRepository games,
+        HttpContext context,
+        CancellationToken cancellationToken)
     {
         var game = await games.GetAsync(id, cancellationToken);
         if (game is null)
@@ -231,7 +243,7 @@ public static class GameEndpoints
             return ApiResults.DomainValidationProblem(result.Errors!);
 
         await games.SaveAsync(game, cancellationToken);
-        return Results.Ok(GameResponse.From(game));
+        return Results.Ok(GameResponse.From(game, context.GetUserId()));
     }
 
     // Prefer the player instance already on the aggregate; fall back to a lookup for not-yet-joined users.

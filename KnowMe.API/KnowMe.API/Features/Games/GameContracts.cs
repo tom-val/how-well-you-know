@@ -1,4 +1,5 @@
 using KnowMe.API.Domain.Entities;
+using KnowMe.API.Domain.Enums;
 using KnowMe.API.Features.Users;
 
 namespace KnowMe.API.Features.Games;
@@ -38,8 +39,15 @@ public record QuestionResponse(
 }
 
 /// <summary>
-/// Game projection for clients. Deliberately excludes individual choices/guesses so
-/// players cannot see each other's answers while a question is still being answered.
+/// The calling player's own progress on the current question. Reveals only the caller's
+/// own actions (never anyone else's answers), so it's safe to return mid-question and lets
+/// the UI recover state after a refresh.
+/// </summary>
+public record ViewerState(bool HasAnswered, IReadOnlyList<Guid> GuessedUserIds);
+
+/// <summary>
+/// Game projection for clients. Deliberately excludes other players' choices/guesses so
+/// nobody can see each other's answers while a question is still being answered.
 /// </summary>
 public record GameResponse(
     Guid Id,
@@ -49,9 +57,10 @@ public record GameResponse(
     Guid CurrentQuestionId,
     Guid CreatedByUser,
     IReadOnlyList<UserResponse> Players,
-    IReadOnlyList<QuestionResponse> Questions)
+    IReadOnlyList<QuestionResponse> Questions,
+    ViewerState? Viewer)
 {
-    public static GameResponse From(Game game) => new(
+    public static GameResponse From(Game game, Guid viewerId) => new(
         game.Id,
         game.Name,
         game.Status.ToString(),
@@ -59,7 +68,29 @@ public record GameResponse(
         game.CurrentQuestionId,
         game.CreatedByUser,
         game.Players.Select(UserResponse.From).ToList(),
-        game.Questions.Select(QuestionResponse.From).ToList());
+        game.Questions.Select(QuestionResponse.From).ToList(),
+        BuildViewer(game, viewerId));
+
+    private static ViewerState? BuildViewer(Game game, Guid viewerId)
+    {
+        if (game.Status != GameStatus.Started)
+        {
+            return null;
+        }
+
+        var current = game.Questions.FirstOrDefault(q => q.Id == game.CurrentQuestionId);
+        if (current is null)
+        {
+            return null;
+        }
+
+        return new ViewerState(
+            current.UserChoices.Any(c => c.UserId == viewerId),
+            current.UserGuesses
+                .Where(g => g.GuessingUserId == viewerId)
+                .Select(g => g.ChoiceUserId)
+                .ToList());
+    }
 }
 
 // --- Summaries (list my games) ---

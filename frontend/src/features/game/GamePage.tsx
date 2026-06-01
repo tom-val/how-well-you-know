@@ -3,12 +3,16 @@ import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
 import { getGame } from "../../api/gamesApi";
 import { Spinner } from "../../components/Spinner";
+import { GameSetup } from "./GameSetup";
+import { AnswerPhase } from "./AnswerPhase";
+import { ReviewPhase } from "./ReviewPhase";
+import { FinalResults } from "./FinalResults";
 
 export default function GamePage() {
   const { t } = useTranslation();
   const { id = "" } = useParams();
 
-  // Poll so players joining / state changes show up live (no WebSockets yet).
+  // Poll so other players' moves / phase changes show up live (no WebSockets yet).
   const gameQuery = useQuery({
     queryKey: ["game", id],
     queryFn: () => getGame(id),
@@ -21,49 +25,37 @@ export default function GamePage() {
       <div className="page">
         <p className="error-text">{t("common.error")}</p>
         <Link to="/" className="link-btn">
-          {t("game.back")}
+          ← {t("game.back")}
         </Link>
       </div>
     );
   }
 
   const game = gameQuery.data;
+  const currentQuestion = game.questions.find((q) => q.id === game.currentQuestionId);
 
   return (
-    <div className="page game-view">
+    <div className="game-view">
       <div className="game-head">
         <Link to="/" className="link-btn">
           ← {t("game.back")}
         </Link>
-        <span className={`badge status-${game.status.toLowerCase()}`}>{t(`status.${game.status}`)}</span>
+        <span className="players-count">
+          {t("game.players")}: {game.players.length}
+        </span>
       </div>
+      <h1 className="game-title">{game.name}</h1>
 
-      <h2>{game.name}</h2>
-      <code className="game-id">{game.id}</code>
+      {game.status === "Created" && <GameSetup game={game} />}
 
-      <section className="card">
-        <h3>
-          {t("game.players")} ({game.players.length})
-        </h3>
-        <ul className="player-list">
-          {game.players.map((p) => (
-            <li key={p.id}>{p.userName}</li>
-          ))}
-        </ul>
-      </section>
+      {game.status === "Started" &&
+        (game.currentQuestionPhase === "Answering" && currentQuestion ? (
+          <AnswerPhase game={game} question={currentQuestion} />
+        ) : (
+          <ReviewPhase game={game} />
+        ))}
 
-      <section className="card">
-        <h3>
-          {t("game.questions")} ({game.questions.length})
-        </h3>
-        <ul className="question-list">
-          {game.questions.map((q) => (
-            <li key={q.id}>{q.text}</li>
-          ))}
-        </ul>
-      </section>
-
-      <p className="muted">{t("game.playComingSoon")}</p>
+      {game.status === "Ended" && <FinalResults game={game} />}
     </div>
   );
 }

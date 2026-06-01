@@ -43,6 +43,37 @@
     "back": "Back",
     "playComingSoon": "Gameplay screens coming soon."
   },
+  "join": {
+    "joining": "Joining the game…",
+    "couldNotJoin": "Couldn't join"
+  },
+  "play": {
+    "shareHint": "Share this link so others can join:",
+    "copyLink": "Copy link",
+    "linkCopied": "Link copied",
+    "noQuestionsYet": "No questions yet.",
+    "addQuestion": "Add a question",
+    "questionText": "Question",
+    "variant": "Option {{notation}}",
+    "addVariant": "Add option",
+    "multipleAnswers": "Multiple answers allowed",
+    "saveQuestion": "Save question",
+    "start": "Start game",
+    "startHint": "Needs at least 2 players and 2 questions.",
+    "yourAnswer": "Your answer",
+    "answer": "Answer",
+    "guessIntro": "Guess what the other players picked.",
+    "guessFor": "What did {{name}} pick?",
+    "guess": "Guess",
+    "waitingOthers": "Waiting for other players…",
+    "review": "Question review",
+    "points": "{{count}} pts",
+    "guessedFor": "Guessed {{name}}",
+    "next": "Next question",
+    "finish": "Finish game",
+    "results": "Results",
+    "backToLobby": "Back to games"
+  },
   "status": {
     "Created": "Created",
     "Started": "In progress",
