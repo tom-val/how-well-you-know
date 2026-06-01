@@ -16,6 +16,7 @@ public record GameRecord
     public Guid CurrentQuestionId { get; init; }
     public List<UserRecord> Players { get; init; } = [];
     public List<QuestionRecord> Questions { get; init; } = [];
+    public List<Guid> ReadyUserIds { get; init; } = [];
 }
 
 public record UserRecord

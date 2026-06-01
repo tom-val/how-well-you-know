@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useSnackbar } from "notistack";
-import { addQuestion, deleteQuestion, startGame } from "../../api/gamesApi";
+import { addQuestion, deleteQuestion, setReady } from "../../api/gamesApi";
 import type { Game } from "../../api/gamesApi";
 import { useLang } from "../../i18n/lang";
 import { useAuth } from "../../hooks/useAuth";
@@ -41,9 +41,10 @@ export function RoomView({ game }: { game: Game }) {
     onSuccess: refresh,
     onError: onErr,
   });
-  const startMutation = useMutation({
-    mutationFn: () => startGame(game.id),
-    onSuccess: () => { refresh(); navigate(`/games/${game.id}/play`); },
+  // The game auto-starts once everyone is ready; GamePage navigates to /play on Created→Started.
+  const readyMutation = useMutation({
+    mutationFn: (ready: boolean) => setReady(game.id, ready),
+    onSuccess: refresh,
     onError: onErr,
   });
 
@@ -54,6 +55,8 @@ export function RoomView({ game }: { game: Game }) {
   };
 
   const canStart = game.players.length >= 2 && game.questions.length >= 2;
+  const meReady = !!user && game.readyUserIds.includes(user.sub);
+  const readyCount = game.readyUserIds.length;
 
   return (
     <div className="page">
@@ -118,16 +121,32 @@ export function RoomView({ game }: { game: Game }) {
               <div className="player-row" key={p.id}>
                 <Avatar name={p.userName} color={playerColor(p.id)} size={34} />
                 <span className="pr-name grow">{p.id === user?.sub ? t.you : p.userName}</span>
+                {game.readyUserIds.includes(p.id) && (
+                  <span className="ready-pill"><Icon.check width="13" height="13" />{t.readyState}</span>
+                )}
                 {p.id === game.createdByUser && <span className="host-pill">{t.createdByYou}</span>}
               </div>
             ))}
           </div>
 
           <div className="enter enter-d2">
-            <button className="btn btn-primary btn-lg btn-block" disabled={!canStart || startMutation.isPending} onClick={() => startMutation.mutate()}>
-              <Icon.spark />{t.startGame}
-            </button>
-            {!canStart && <div className="start-note">{t.needMore}</div>}
+            {meReady ? (
+              <button className="btn btn-soft btn-lg btn-block" disabled={readyMutation.isPending} onClick={() => readyMutation.mutate(false)}>
+                <Icon.check />{t.cancelReady}
+              </button>
+            ) : (
+              <button className="btn btn-primary btn-lg btn-block" disabled={!canStart || readyMutation.isPending} onClick={() => readyMutation.mutate(true)}>
+                <Icon.spark />{t.imReady}
+              </button>
+            )}
+            {!canStart ? (
+              <div className="start-note">{t.needMore}</div>
+            ) : (
+              <div className="start-note">
+                {t.readyCount(readyCount, game.players.length)}
+                {readyCount < game.players.length && ` · ${t.waitingReady}`}
+              </div>
+            )}
           </div>
         </div>
       </div>

@@ -11,6 +11,12 @@ public class Game
     public List<User> Players { get; private set; }
     public List<Question> Questions { get; private set; } = new List<Question>();
 
+    /// <summary>
+    /// Players (by id) who have clicked "ready" in the lobby. The game starts only once
+    /// every current player is ready (and the minimums are met).
+    /// </summary>
+    public List<Guid> ReadyUserIds { get; private set; } = new List<Guid>();
+
     public Guid CurrentQuestionId { get; private set; }
     public Guid CreatedByUser { get; private set; }
     public GameStatus Status { get; private set; }
@@ -275,6 +281,9 @@ public class Game
         question.Order = Questions.Count == 0 ? 0 : Questions.Max(q => q.Order) + 1;
         Questions.Add(question);
 
+        // If everyone already readied and this addition meets the minimum, start now.
+        TryAutoStart();
+
         //TODO Domain event that question added
         return Result<Game>.Success(this);
     }
@@ -293,6 +302,60 @@ public class Game
 
         //TODO Domain event that question removed
         return Result<Game>.Success(this);
+    }
+
+    /// <summary>
+    /// Marks (or unmarks) the player as ready in the lobby. When every current player is
+    /// ready and the start minimums are met, the game starts automatically.
+    /// </summary>
+    public Result<Game> SetReady(User user, bool ready)
+    {
+        if (Status != GameStatus.Created)
+        {
+            return Result<Game>.Failure([new ValidationError
+            {
+                Message = "Game has already been started"
+            }]);
+        }
+
+        if (Players.All(p => p.Id != user.Id))
+        {
+            return Result<Game>.Failure([new ValidationError
+            {
+                Message = "User is not a player in this game"
+            }]);
+        }
+
+        if (ready)
+        {
+            if (!ReadyUserIds.Contains(user.Id))
+            {
+                ReadyUserIds.Add(user.Id);
+            }
+        }
+        else
+        {
+            ReadyUserIds.Remove(user.Id);
+        }
+
+        TryAutoStart();
+
+        //TODO Domain event that readiness changed
+        return Result<Game>.Success(this);
+    }
+
+    // Starts the game the moment every player is ready and the minimums are satisfied.
+    private void TryAutoStart()
+    {
+        if (Status != GameStatus.Created || Players.Count < 2 || Questions.Count <= 1)
+        {
+            return;
+        }
+
+        if (Players.All(p => ReadyUserIds.Contains(p.Id)))
+        {
+            StartGame();
+        }
     }
 
     public Result<Game> StartGame()
@@ -350,7 +413,8 @@ public class Game
         Guid currentQuestionId,
         Guid createdByUser,
         GameStatus status,
-        QuestionPhase currentQuestionPhase)
+        QuestionPhase currentQuestionPhase,
+        List<Guid> readyUserIds)
     {
         var game = new Game
         {
@@ -362,7 +426,8 @@ public class Game
             CurrentQuestionId = currentQuestionId,
             CreatedByUser = createdByUser,
             Status = status,
-            CurrentQuestionPhase = currentQuestionPhase
+            CurrentQuestionPhase = currentQuestionPhase,
+            ReadyUserIds = readyUserIds
         };
 
         foreach (var question in questions)

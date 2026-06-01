@@ -14,6 +14,8 @@ public record RecordChoiceRequest(string[] VariantNotations);
 
 public record RecordGuessRequest(Guid ChoiceUserId, string[] VariantNotations);
 
+public record SetReadyRequest(bool Ready);
+
 // --- Responses ---
 
 public record VariantResponse(Guid Id, string Notation, string Text);
@@ -59,7 +61,8 @@ public record GameResponse(
     IReadOnlyList<UserResponse> Players,
     IReadOnlyList<QuestionResponse> Questions,
     ViewerState? Viewer,
-    IReadOnlyList<Guid> AwaitingPlayerIds)
+    IReadOnlyList<Guid> AwaitingPlayerIds,
+    IReadOnlyList<Guid> ReadyUserIds)
 {
     public static GameResponse From(Game game, Guid viewerId) => new(
         game.Id,
@@ -71,7 +74,8 @@ public record GameResponse(
         game.Players.Select(UserResponse.From).ToList(),
         game.Questions.Select(QuestionResponse.From).ToList(),
         BuildViewer(game, viewerId),
-        BuildAwaiting(game));
+        BuildAwaiting(game),
+        game.ReadyUserIds.ToList());
 
     private static ViewerState? BuildViewer(Game game, Guid viewerId)
     {

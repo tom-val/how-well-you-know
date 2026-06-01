@@ -20,7 +20,7 @@ public static class GameEndpoints
         group.MapPost("/{id:guid}/join", JoinGame);
         group.MapPost("/{id:guid}/questions", AddQuestion);
         group.MapDelete("/{id:guid}/questions/{questionId:guid}", RemoveQuestion);
-        group.MapPost("/{id:guid}/start", StartGame);
+        group.MapPost("/{id:guid}/ready", SetReady);
         group.MapPost("/{id:guid}/choices", RecordChoice);
         group.MapPost("/{id:guid}/guesses", RecordGuess);
         group.MapPost("/{id:guid}/advance", AdvanceQuestion);
@@ -169,9 +169,13 @@ public static class GameEndpoints
         return Results.Ok(GameResponse.From(game, context.GetUserId()));
     }
 
-    private static async Task<IResult> StartGame(
+    // A player marks themselves ready in the lobby. The game starts automatically once every
+    // current player is ready (and the 2-player / 2-question minimums are met).
+    private static async Task<IResult> SetReady(
         Guid id,
+        SetReadyRequest request,
         IGameRepository games,
+        IUserRepository users,
         IGameNotifier notifier,
         HttpContext context,
         CancellationToken cancellationToken)
@@ -180,7 +184,11 @@ public static class GameEndpoints
         if (game is null)
             return Results.NotFound(new { error = "Game not found." });
 
-        var result = game.StartGame();
+        var user = await ResolveUserAsync(game, context.GetUserId(), users, cancellationToken);
+        if (user is null)
+            return Results.NotFound(new { error = "Acting user not found." });
+
+        var result = game.SetReady(user, request.Ready);
         if (!result.IsSuccess)
             return ApiResults.DomainValidationProblem(result.Errors!);
 

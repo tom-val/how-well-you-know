@@ -102,6 +102,11 @@
 .player-row .pr-name { font-weight: 600; font-size: 14.5px; }
 .player-row .you-tag { font-size: 11px; font-weight: 700; color: var(--primary); background: var(--primary-soft); padding: 2px 8px; border-radius: 99px; }
 .host-pill { font-size: 11px; font-weight: 700; color: var(--ink-faint); }
+.ready-pill {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 11px; font-weight: 700; color: var(--live);
+  background: var(--live-bg); padding: 3px 9px 3px 7px; border-radius: 99px;
+}
 
 .q-list { display: flex; flex-direction: column; gap: 10px; margin-top: 4px; }
 .q-item {

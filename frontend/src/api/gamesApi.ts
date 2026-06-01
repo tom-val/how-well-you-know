@@ -29,6 +29,7 @@ export interface Game {
   questions: Question[];
   viewer: ViewerState | null;
   awaitingPlayerIds: string[];
+  readyUserIds: string[];
 }
 
 export interface Player {
@@ -138,8 +139,9 @@ export async function deleteQuestion(gameId: string, questionId: string): Promis
   return data;
 }
 
-export async function startGame(id: string): Promise<Game> {
-  const { data } = await apiClient.post<Game>(`/v1/games/${id}/start`);
+/** Marks the current player ready/not-ready in the lobby. The game auto-starts once all are ready. */
+export async function setReady(id: string, ready: boolean): Promise<Game> {
+  const { data } = await apiClient.post<Game>(`/v1/games/${id}/ready`, { ready });
   return data;
 }
 

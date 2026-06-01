@@ -59,6 +59,11 @@ export const STR = {
     options: (n: number) => `${n} options`,
     multiTag: "Multi",
     startGame: "Start game",
+    imReady: "I'm ready",
+    cancelReady: "Cancel ready",
+    readyState: "Ready",
+    readyCount: (n: number, total: number) => `${n} of ${total} players ready`,
+    waitingReady: "Waiting for everyone to be ready…",
     needMore: "You need at least 2 players and 2 questions to start.",
     deleteQ: "Delete question",
 
@@ -236,6 +241,11 @@ export const STR = {
     options: (n: number) => `${n} variantai`,
     multiTag: "Keli",
     startGame: "Pradėti žaidimą",
+    imReady: "Esu pasiruošęs",
+    cancelReady: "Atšaukti pasiruošimą",
+    readyState: "Pasiruošęs",
+    readyCount: (n: number, total: number) => `Pasiruošę ${n} iš ${total} žaidėjų`,
+    waitingReady: "Laukiama, kol visi bus pasiruošę…",
     needMore: "Reikia bent 2 žaidėjų ir 2 klausimų, kad pradėtum.",
     deleteQ: "Ištrinti klausimą",
 

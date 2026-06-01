@@ -21,7 +21,8 @@ internal static class GameMapper
         CurrentQuestionPhase = game.CurrentQuestionPhase.ToString(),
         CurrentQuestionId = game.CurrentQuestionId,
         Players = game.Players.Select(UserMapper.ToRecord).ToList(),
-        Questions = game.Questions.Select(ToRecord).ToList()
+        Questions = game.Questions.Select(ToRecord).ToList(),
+        ReadyUserIds = game.ReadyUserIds.ToList()
     };
 
     public static Game ToDomain(GameRecord record)
@@ -38,7 +39,8 @@ internal static class GameMapper
             record.CurrentQuestionId,
             record.CreatedByUser,
             Enum.Parse<GameStatus>(record.Status),
-            Enum.Parse<QuestionPhase>(record.CurrentQuestionPhase));
+            Enum.Parse<QuestionPhase>(record.CurrentQuestionPhase),
+            record.ReadyUserIds.ToList());
     }
 
     private static QuestionRecord ToRecord(Question question) => new()
