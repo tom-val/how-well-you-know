@@ -37,6 +37,8 @@ jobs:
       api_endpoint: ${{ steps.outputs.outputs.api_endpoint }}
       cognito_user_pool_id: ${{ steps.outputs.outputs.cognito_user_pool_id }}
       cognito_client_id: ${{ steps.outputs.outputs.cognito_client_id }}
+      s3_frontend_bucket: ${{ steps.outputs.outputs.s3_frontend_bucket }}
+      cloudfront_distribution_id: ${{ steps.outputs.outputs.cloudfront_distribution_id }}
     steps:
       - uses: actions/checkout@v4
 
@@ -66,6 +68,8 @@ jobs:
           echo "api_endpoint=$(terraform output -raw api_endpoint)" >> "$GITHUB_OUTPUT"
           echo "cognito_user_pool_id=$(terraform output -raw cognito_user_pool_id)" >> "$GITHUB_OUTPUT"
           echo "cognito_client_id=$(terraform output -raw cognito_client_id)" >> "$GITHUB_OUTPUT"
+          echo "s3_frontend_bucket=$(terraform output -raw s3_frontend_bucket)" >> "$GITHUB_OUTPUT"
+          echo "cloudfront_distribution_id=$(terraform output -raw cloudfront_distribution_id)" >> "$GITHUB_OUTPUT"
 
   backend:
     name: Deploy Backend
@@ -133,3 +137,46 @@ jobs:
           aws lambda update-function-code \
             --function-name ${{ needs.infra.outputs.authorizer_function_name }} \
             --zip-file fileb://../authorizer.zip
+
+  frontend:
+    name: Deploy Frontend
+    needs: infra
+    runs-on: ubuntu-latest
+    environment: Prod
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: eu-central-1
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+        env:
+          VITE_API_URL: ${{ needs.infra.outputs.api_endpoint }}
+          VITE_COGNITO_USER_POOL_ID: ${{ needs.infra.outputs.cognito_user_pool_id }}
+          VITE_COGNITO_CLIENT_ID: ${{ needs.infra.outputs.cognito_client_id }}
+
+      - name: Sync to S3
+        run: aws s3 sync dist/ "s3://${{ needs.infra.outputs.s3_frontend_bucket }}" --delete
+
+      - name: Invalidate CloudFront cache
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id ${{ needs.infra.outputs.cloudfront_distribution_id }} \
+            --paths "/*"

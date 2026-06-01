@@ -23,14 +23,16 @@ The app is being rewritten around a pure domain layer with an AWS-serverless bac
   user id (the token `sub`) into the request context. The app trusts only that id, so callers
   cannot impersonate each other. Domain users are keyed by the Cognito subject. For local dev
   and tests there is no Cognito — an `X-User-Id` header stands in for the authorizer.
-- **Frontend (planned)** — a private S3 bucket served by a CloudFront distribution (OAC, SPA
-  routing) is already provisioned by Terraform, ready for the frontend app. The API's CORS
-  policy is wired to the CloudFront URL automatically.
+- **Frontend (`frontend/`)** — React 19 + Vite + TypeScript SPA (react-router, TanStack Query,
+  axios, `amazon-cognito-identity-js`, i18next lt/en). Cognito sign-up/sign-in, an axios client
+  that attaches the access token, and a lobby (create / join / list-my-games). Served from a
+  private S3 bucket via CloudFront (OAC, SPA routing); the API's CORS is wired to the CloudFront
+  URL automatically. Gameplay screens (question setup, answer/guess/review, results) are next.
 - **Infrastructure (`infra/`)** — modular Terraform (DynamoDB, Lambda, API Gateway, S3 +
   CloudFront), composed in `infra/environments/prod` with an S3 state backend.
 - **CI/CD (`.github/workflows/deploy-prod.yml`)** — on push to `main`: build & test, `terraform
-  apply`, then publish the .NET 10 `linux-arm64` Lambda and update the function code. A
-  frontend build/sync/invalidate job will be added alongside the frontend app.
+  apply`, then in parallel publish the .NET 10 `linux-arm64` Lambda, the Node.js authorizer, and
+  the frontend (build → S3 sync → CloudFront invalidation).
 
 > The legacy combined API + React UI lives in `HowWellYouKnow.API/` and is being retired.
 
@@ -54,6 +56,9 @@ cd KnowMe.API && dotnet run --project KnowMe.API
 
 # Plan infrastructure
 cd infra/environments/prod && terraform init && terraform plan
+
+# Frontend (dev server proxies /v1 to the deployed API, so no CORS faff)
+cd frontend && npm install && npm run dev
 ```
 
 ## Deployment
@@ -113,20 +118,21 @@ terraform apply
 
 ### Custom domain (frontend)
 
-The frontend serves on the default `*.cloudfront.net` URL (Terraform output
-`cloudfront_domain_name`) until a domain is wired up. To use a custom domain, create an ACM
-certificate in **us-east-1** (CloudFront only accepts certs from that region), then pass it
-along with the domain(s):
+The frontend is served at **https://quiz.valiunas.dev**. This is wired in `prod` via two
+variables: `cloudfront_aliases = ["quiz.valiunas.dev"]` and `acm_certificate_arn` (a wildcard
+`*.valiunas.dev` cert in **us-east-1** — CloudFront only accepts certs from that region). The
+alias is attached to CloudFront and added to the API's allowed CORS origins automatically.
 
-```bash
-terraform apply \
-  -var='acm_certificate_arn=arn:aws:acm:us-east-1:...:certificate/...' \
-  -var='cloudfront_aliases=["knowme.valiunas.dev"]'
+DNS lives outside AWS (Cloudflare / registrar), so after `terraform apply` add one record at
+the DNS provider:
+
+```
+quiz.valiunas.dev   CNAME   <cloudfront_domain_name>   # Terraform output
 ```
 
-This enables the alias on CloudFront and adds it to the API's allowed CORS origins. Point the
-domain's DNS at the CloudFront distribution afterwards. For local frontend development, allow
-the dev origin without a deploy via `-var='extra_cors_allowed_origins=["http://localhost:5173"]'`.
+To serve on the default `*.cloudfront.net` URL instead, apply with `-var='acm_certificate_arn='`.
+For local frontend dev the Vite server proxies `/v1` to the API (no CORS), so no origin change
+is needed; otherwise add one with `-var='extra_cors_allowed_origins=["http://localhost:5173"]'`.
 
 ## API endpoints
 

@@ -1,0 +1,56 @@
+{
+  "app": {
+    "title": "How well you know?",
+    "tagline": "Create questions and guess how the others will answer."
+  },
+  "nav": {
+    "lobby": "Games",
+    "signOut": "Sign out"
+  },
+  "auth": {
+    "emailLabel": "Email",
+    "passwordLabel": "Password",
+    "displayNameLabel": "Display name",
+    "signIn": "Sign in",
+    "signUp": "Sign up",
+    "signingIn": "Signing in…",
+    "signingUp": "Signing up…",
+    "noAccount": "No account yet?",
+    "haveAccount": "Already have an account?",
+    "confirmTitle": "Confirm your email",
+    "confirmHint": "Enter the code we emailed you.",
+    "codeLabel": "Confirmation code",
+    "confirm": "Confirm",
+    "confirming": "Confirming…",
+    "confirmedNowSignIn": "Email confirmed. You can sign in now."
+  },
+  "lobby": {
+    "title": "Your games",
+    "empty": "You're not in any games yet.",
+    "createTitle": "Create a game",
+    "nameLabel": "Game name",
+    "create": "Create",
+    "joinTitle": "Join a game",
+    "gameIdLabel": "Game ID",
+    "join": "Join",
+    "createdByYou": "Created by you",
+    "open": "Open"
+  },
+  "game": {
+    "players": "Players",
+    "questions": "Questions",
+    "status": "Status",
+    "back": "Back",
+    "playComingSoon": "Gameplay screens coming soon."
+  },
+  "status": {
+    "Created": "Created",
+    "Started": "In progress",
+    "Ended": "Finished"
+  },
+  "common": {
+    "loading": "Loading…",
+    "error": "Something went wrong.",
+    "language": "Language"
+  }
+}
