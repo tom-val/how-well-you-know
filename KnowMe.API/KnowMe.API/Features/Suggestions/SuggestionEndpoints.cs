@@ -14,7 +14,7 @@ public static class SuggestionEndpoints
     {
         var language = string.Equals(request.Language, "lt", StringComparison.OrdinalIgnoreCase) ? "lt" : "en";
 
-        var suggestion = await suggester.SuggestAsync(language, request.Topic, cancellationToken);
+        var suggestion = await suggester.SuggestAsync(language, request.Topic, request.Avoid, cancellationToken);
 
         // 502 signals the client to fall back to its built-in static suggestion bank.
         return suggestion is null

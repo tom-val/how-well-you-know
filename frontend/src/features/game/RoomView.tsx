@@ -135,7 +135,12 @@ export function RoomView({ game }: { game: Game }) {
         </div>
       </div>
 
-      <QuestionModal open={modal} onClose={() => setModal(false)} onSave={(q) => addMutation.mutate(q)} />
+      <QuestionModal
+        open={modal}
+        onClose={() => setModal(false)}
+        onSave={(q) => addMutation.mutate(q)}
+        existing={game.questions.map((q) => q.text)}
+      />
     </div>
   );
 }

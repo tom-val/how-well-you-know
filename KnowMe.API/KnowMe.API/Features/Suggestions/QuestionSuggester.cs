@@ -10,8 +10,10 @@ public interface IQuestionSuggester
     /// <summary>
     /// Generates one question via the model, or returns null if AI is unavailable
     /// (no key, provider error, timeout, or malformed output) so the caller can fall back.
+    /// <paramref name="avoid"/> lists questions the model should not repeat or rephrase.
     /// </summary>
-    Task<QuestionSuggestionResponse?> SuggestAsync(string language, string? topic, CancellationToken cancellationToken);
+    Task<QuestionSuggestionResponse?> SuggestAsync(
+        string language, string? topic, IReadOnlyList<string>? avoid, CancellationToken cancellationToken);
 }
 
 public class OpenAiQuestionSuggester : IQuestionSuggester
@@ -32,8 +34,39 @@ public class OpenAiQuestionSuggester : IQuestionSuggester
         _logger = logger;
     }
 
+    // A wide pool of subjects and framings; one of each is picked at random per call so the
+    // model ranges across the whole space instead of defaulting to the same few questions.
+    private static readonly string[] Topics =
+    [
+        "food and snacks", "drinks and coffee", "travel and faraway places", "daily routines and habits",
+        "movies and TV shows", "music and concerts", "books and reading", "technology and gadgets",
+        "money, shopping and splurges", "friendships and social life", "work and study life",
+        "childhood memories and nostalgia", "dreams and the future", "personality quirks",
+        "holidays and celebrations", "sports and the outdoors", "pets and animals",
+        "fashion and personal style", "home and living spaces", "guilty pleasures",
+        "fears and pet peeves", "weekends and free time", "cooking and the kitchen",
+        "phones and social media", "weather and seasons", "games and competition",
+        "superstitions and luck", "health and fitness", "cars and getting around",
+        "art and creativity", "languages and words", "the internet and memes",
+        "morning vs night routines", "embarrassing moments", "small everyday decisions",
+    ];
+
+    private static readonly string[] Angles =
+    [
+        "Make it a this-or-that dilemma.",
+        "Phrase it as a \"who is most likely to...\" question.",
+        "Make it a would-you-rather with two vivid options.",
+        "Ask about a favorite or a top pick.",
+        "Make it a guilty-pleasure confession.",
+        "Set up a fun hypothetical scenario.",
+        "Ask about a pet peeve or a deal-breaker.",
+        "Ask about a quirky everyday habit.",
+        "Make it a playful preference question.",
+        "Ask which option they'd pick in a pinch.",
+    ];
+
     public async Task<QuestionSuggestionResponse?> SuggestAsync(
-        string language, string? topic, CancellationToken cancellationToken)
+        string language, string? topic, IReadOnlyList<string>? avoid, CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(_settings.ApiKey))
         {
@@ -41,13 +74,39 @@ public class OpenAiQuestionSuggester : IQuestionSuggester
         }
 
         var languageName = language == "lt" ? "Lithuanian" : "English";
-        var topicLine = string.IsNullOrWhiteSpace(topic)
-            ? "Pick any everyday topic: food, drinks, travel, hobbies, preferences, this-or-that."
-            : $"Topic: {topic}.";
+
+        var userPrompt = new StringBuilder();
+        if (string.IsNullOrWhiteSpace(topic))
+        {
+            userPrompt.Append($"Topic: {Topics[Random.Shared.Next(Topics.Length)]}. ");
+            userPrompt.Append(Angles[Random.Shared.Next(Angles.Length)]);
+        }
+        else
+        {
+            userPrompt.Append($"Topic: {topic}.");
+        }
+
+        // Steer away from anything already on screen so suggestions don't repeat.
+        var recent = (avoid ?? [])
+            .Where(a => !string.IsNullOrWhiteSpace(a))
+            .Select(a => a.Trim())
+            .TakeLast(25)
+            .ToList();
+        if (recent.Count > 0)
+        {
+            userPrompt.Append(" Do NOT repeat, translate, or closely rephrase any of these existing questions: ");
+            userPrompt.Append(string.Join(" | ", recent));
+            userPrompt.Append('.');
+        }
+
+        // A nonce nudges the model off identical outputs on otherwise identical inputs.
+        userPrompt.Append($" Make it clearly different and a little unexpected. (variety seed {Random.Shared.Next(100000, 1000000)})");
 
         var systemPrompt =
             "You write questions for a party game where players guess how their friends will answer. " +
             "Generate exactly ONE short, fun, real question with 2 to 4 concise answer options. " +
+            "Be creative and specific, and vary the subject and phrasing every time — avoid generic clichés " +
+            "like \"What is your favorite color?\". " +
             "The question must be at most 80 characters; each option at most 40 characters. " +
             $"Write the question and all options in {languageName}. " +
             "Respond with ONLY a JSON object of the form {\"text\": string, \"options\": [string, ...]}.";
@@ -59,7 +118,7 @@ public class OpenAiQuestionSuggester : IQuestionSuggester
             messages = new object[]
             {
                 new { role = "system", content = systemPrompt },
-                new { role = "user", content = topicLine },
+                new { role = "user", content = userPrompt.ToString() },
             },
         };
 

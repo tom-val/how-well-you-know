@@ -449,8 +449,13 @@ const POOL = buildPool();
 /** Number of distinct questions available (useful for sanity checks). */
 export const QUESTION_COUNT = POOL.length;
 
-/** Returns a random real question in the given language. */
-export function suggestQuestion(lang: Lang): Suggestion {
-  const q = POOL[Math.floor(Math.random() * POOL.length)];
+/** Returns a random real question in the given language, avoiding any text in `avoid`. */
+export function suggestQuestion(lang: Lang, avoid: string[] = []): Suggestion {
+  const taken = new Set(avoid.map((a) => a.trim().toLowerCase()));
+  // A few attempts to dodge repeats; fall back to any question if the pool is exhausted.
+  let q = POOL[Math.floor(Math.random() * POOL.length)];
+  for (let i = 0; i < 8 && taken.has(q.text[lang].trim().toLowerCase()); i++) {
+    q = POOL[Math.floor(Math.random() * POOL.length)];
+  }
   return { text: q.text[lang], options: q.options.map((o) => o[lang]) };
 }

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLang } from "../../i18n/lang";
 import { Icon, Modal } from "../../components/ui";
 import { suggestQuestion } from "./questionBank";
@@ -13,17 +13,32 @@ export interface NewQuestion {
   multi: boolean;
 }
 
-export function QuestionModal({ open, onClose, onSave }: { open: boolean; onClose: () => void; onSave: (q: NewQuestion) => void }) {
+export function QuestionModal({
+  open,
+  onClose,
+  onSave,
+  existing = [],
+}: {
+  open: boolean;
+  onClose: () => void;
+  onSave: (q: NewQuestion) => void;
+  existing?: string[];
+}) {
   const { t, lang } = useLang();
   const [text, setText] = useState("");
   const [opts, setOpts] = useState<string[]>(["", ""]);
   const [multi, setMulti] = useState(false);
   const [aiBusy, setAiBusy] = useState(false);
   const [diceSpin, setDiceSpin] = useState(false);
+  // Questions suggested this session, so a repeat roll doesn't surface the same one again.
+  const suggestedRef = useRef<string[]>([]);
 
   useEffect(() => {
-    if (open) { setText(""); setOpts(["", ""]); setMulti(false); setAiBusy(false); }
+    if (open) { setText(""); setOpts(["", ""]); setMulti(false); setAiBusy(false); suggestedRef.current = []; }
   }, [open]);
+
+  const avoidList = () => [...existing, ...suggestedRef.current];
+  const remember = (q: string) => { suggestedRef.current = [...suggestedRef.current, q].slice(-30); };
 
   const valid = text.trim() !== "" && opts.filter((o) => o.trim()).length >= 2;
   const setOpt = (i: number, v: string) => setOpts((o) => o.map((x, j) => (j === i ? v : x)));
@@ -40,16 +55,22 @@ export function QuestionModal({ open, onClose, onSave }: { open: boolean; onClos
   const suggestRandom = () => {
     setDiceSpin(true);
     setTimeout(() => setDiceSpin(false), 500);
-    applyQuestion(suggestQuestion(lang));
+    const q = suggestQuestion(lang, avoidList());
+    remember(q.text);
+    applyQuestion(q);
   };
 
   const suggestAI = async () => {
     if (aiBusy) return;
     setAiBusy(true);
     try {
-      applyQuestion(await suggestAiQuestion(lang));
+      const q = await suggestAiQuestion(lang, undefined, avoidList());
+      remember(q.text);
+      applyQuestion(q);
     } catch {
-      applyQuestion(suggestQuestion(lang)); // graceful fallback to the static bank
+      const q = suggestQuestion(lang, avoidList()); // graceful fallback to the static bank
+      remember(q.text);
+      applyQuestion(q);
     } finally {
       setAiBusy(false);
     }
