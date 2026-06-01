@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { getGame } from "../../api/gamesApi";
@@ -15,8 +16,19 @@ export default function GamePage() {
   const gameQuery = useQuery({
     queryKey: ["game", id],
     queryFn: () => getGame(id),
-    refetchInterval: (query) => (query.state.data?.status === "Ended" ? false : 5000),
+    refetchInterval: (query) => (query.state.data?.status === "Ended" ? false : 4000),
   });
+
+  // If the game starts while we're sitting in the room, drop straight into play.
+  // (Opening an already-live game from the lobby keeps showing the overview + Resume.)
+  const prevStatus = useRef<string | undefined>(undefined);
+  useEffect(() => {
+    const status = gameQuery.data?.status;
+    if (prevStatus.current === "Created" && status === "Started") {
+      navigate(`/games/${id}/play`, { replace: true });
+    }
+    prevStatus.current = status;
+  }, [gameQuery.data?.status, id, navigate]);
 
   if (gameQuery.isLoading) return <div className="page"><Spinner t={t} /></div>;
   if (gameQuery.isError || !gameQuery.data) {

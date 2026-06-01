@@ -128,7 +128,7 @@ export default function PlayPage() {
               <div className="gw-name">{t.guessTitle(target.userName)}</div>
             </div>
           </div>
-          <AnswerCard key={`${current.id}-${target.id}`} question={current} multi={false} submitting={guessMutation.isPending} t={t} guess
+          <AnswerCard key={`${current.id}-${target.id}`} question={current} multi={current.multipleAnswers} submitting={guessMutation.isPending} t={t} guess
             lastTarget={remaining.length === 1}
             onSubmit={(n) => guessMutation.mutate({ target: target.id, n })} />
         </div>
@@ -185,6 +185,11 @@ function AnswerCard({ question, multi, submitting, t, guess, lastTarget, onSubmi
         </div>
       )}
       {guess && <div className="muted" style={{ fontSize: 13.5, marginBottom: 12, fontWeight: 600 }}>{t.guessSub}</div>}
+      {multi && (
+        <span className="badge tag" style={{ marginBottom: 12, padding: "5px 11px" }}>
+          <Icon.check width="13" height="13" />{t.multiHint}
+        </span>
+      )}
       <div className="opt-list">
         {variants.map((v) => {
           const on = sel.includes(v.notation);
