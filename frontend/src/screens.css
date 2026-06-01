@@ -427,6 +427,10 @@
 .qr-nav { display: flex; justify-content: space-between; gap: 12px; margin-top: 18px; }
 .qr-nav .btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
+/* auth divider ("or") */
+.auth-divider { display: flex; align-items: center; gap: 12px; margin: 16px 0; color: var(--ink-faint); font-size: 12.5px; font-weight: 700; }
+.auth-divider::before, .auth-divider::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+
 /* in-play header scoreboard */
 .score-strip { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
 .score-pill {

@@ -8,6 +8,7 @@ import { useT } from "./i18n/lang";
 
 const Login = lazy(() => import("./features/auth/Login"));
 const Register = lazy(() => import("./features/auth/Register"));
+const AuthCallbackPage = lazy(() => import("./features/auth/AuthCallbackPage"));
 const LobbyPage = lazy(() => import("./features/lobby/LobbyPage"));
 const GamesListPage = lazy(() => import("./features/lobby/GamesListPage"));
 const GamePage = lazy(() => import("./features/game/GamePage"));
@@ -24,6 +25,7 @@ function Lazy({ children }: { children: ReactNode }) {
 export const router = createBrowserRouter([
   { path: "/login", element: <Lazy><Login /></Lazy> },
   { path: "/register", element: <Lazy><Register /></Lazy> },
+  { path: "/auth/callback", element: <Lazy><AuthCallbackPage /></Lazy> },
   {
     path: "/",
     element: (

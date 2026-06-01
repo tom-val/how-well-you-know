@@ -37,6 +37,7 @@ jobs:
       api_endpoint: ${{ steps.outputs.outputs.api_endpoint }}
       cognito_user_pool_id: ${{ steps.outputs.outputs.cognito_user_pool_id }}
       cognito_client_id: ${{ steps.outputs.outputs.cognito_client_id }}
+      cognito_hosted_domain: ${{ steps.outputs.outputs.cognito_hosted_domain }}
       s3_frontend_bucket: ${{ steps.outputs.outputs.s3_frontend_bucket }}
       cloudfront_distribution_id: ${{ steps.outputs.outputs.cloudfront_distribution_id }}
     steps:
@@ -62,6 +63,9 @@ jobs:
         env:
           # Optional — empty disables AI suggestions (clients fall back to the static bank).
           TF_VAR_openai_api_key: ${{ secrets.OPENAI_API_KEY }}
+          # Optional — empty leaves Google sign-in disabled (email/password still works).
+          TF_VAR_google_client_id: ${{ secrets.GOOGLE_CLIENT_ID }}
+          TF_VAR_google_client_secret: ${{ secrets.GOOGLE_CLIENT_SECRET }}
 
       - name: Export outputs
         id: outputs
@@ -71,6 +75,7 @@ jobs:
           echo "api_endpoint=$(terraform output -raw api_endpoint)" >> "$GITHUB_OUTPUT"
           echo "cognito_user_pool_id=$(terraform output -raw cognito_user_pool_id)" >> "$GITHUB_OUTPUT"
           echo "cognito_client_id=$(terraform output -raw cognito_client_id)" >> "$GITHUB_OUTPUT"
+          echo "cognito_hosted_domain=$(terraform output -raw cognito_hosted_domain)" >> "$GITHUB_OUTPUT"
           echo "s3_frontend_bucket=$(terraform output -raw s3_frontend_bucket)" >> "$GITHUB_OUTPUT"
           echo "cloudfront_distribution_id=$(terraform output -raw cloudfront_distribution_id)" >> "$GITHUB_OUTPUT"
 
@@ -174,6 +179,7 @@ jobs:
           VITE_API_URL: ${{ needs.infra.outputs.api_endpoint }}
           VITE_COGNITO_USER_POOL_ID: ${{ needs.infra.outputs.cognito_user_pool_id }}
           VITE_COGNITO_CLIENT_ID: ${{ needs.infra.outputs.cognito_client_id }}
+          VITE_COGNITO_DOMAIN: ${{ needs.infra.outputs.cognito_hosted_domain }}
 
       - name: Sync to S3
         run: aws s3 sync dist/ "s3://${{ needs.infra.outputs.s3_frontend_bucket }}" --delete

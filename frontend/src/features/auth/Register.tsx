@@ -5,6 +5,7 @@ import { useSnackbar } from "notistack";
 import { useAuth } from "../../hooks/useAuth";
 import { useLang } from "../../i18n/lang";
 import { AuthCard } from "./AuthCard";
+import { GoogleButton } from "./GoogleButton";
 
 export default function Register() {
   const { t } = useLang();
@@ -81,6 +82,7 @@ export default function Register() {
           {busy ? t.signingUp : t.signUp}
         </button>
       </form>
+      <GoogleButton />
       <p className="muted" style={{ marginTop: 16, fontSize: 14 }}>
         {t.haveAccount}{" "}
         <Link to="/login" className="lnk" style={{ display: "inline" }}>{t.signIn}</Link>

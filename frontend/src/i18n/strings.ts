@@ -175,6 +175,8 @@ export const STR = {
     confirm: "Confirm",
     confirming: "Confirming…",
     confirmedNowSignIn: "Email confirmed. You can sign in now.",
+    or: "or",
+    continueWithGoogle: "Continue with Google",
   },
   lt: {
     brand: "Kaip gerai pažįsti?",
@@ -340,6 +342,8 @@ export const STR = {
     confirm: "Patvirtinti",
     confirming: "Tvirtinama…",
     confirmedNowSignIn: "El. paštas patvirtintas. Dabar gali prisijungti.",
+    or: "arba",
+    continueWithGoogle: "Tęsti su Google",
   },
 };
 

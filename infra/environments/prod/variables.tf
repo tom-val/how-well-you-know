@@ -25,3 +25,16 @@ variable "openai_api_key" {
   sensitive = true
   default   = ""
 }
+
+# Google OAuth credentials for "Sign in with Google". Empty leaves the Google identity
+# provider uncreated (email/password still works). Set via GitHub secrets.
+variable "google_client_id" {
+  type    = string
+  default = ""
+}
+
+variable "google_client_secret" {
+  type      = string
+  sensitive = true
+  default   = ""
+}

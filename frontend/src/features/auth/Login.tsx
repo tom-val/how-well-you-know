@@ -5,6 +5,7 @@ import { useSnackbar } from "notistack";
 import { useAuth } from "../../hooks/useAuth";
 import { useLang } from "../../i18n/lang";
 import { AuthCard } from "./AuthCard";
+import { GoogleButton } from "./GoogleButton";
 
 interface LocationState {
   from?: { pathname: string };
@@ -51,6 +52,7 @@ export default function Login() {
           {busy ? t.signingIn : t.signIn}
         </button>
       </form>
+      <GoogleButton />
       <p className="muted" style={{ marginTop: 16, fontSize: 14 }}>
         {t.noAccount}{" "}
         <Link to="/register" className="lnk" style={{ display: "inline" }}>{t.signUp}</Link>

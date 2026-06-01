@@ -46,6 +46,34 @@ resource "aws_cognito_user_pool" "main" {
   }
 }
 
+# Hosted-UI domain — required for federated (Google) sign-in via the OAuth redirect flow.
+resource "aws_cognito_user_pool_domain" "main" {
+  domain       = "${var.project_name}-${var.environment}"
+  user_pool_id = aws_cognito_user_pool.main.id
+}
+
+# Google identity provider — only created once credentials are supplied, so the stack
+# deploys cleanly before Google is configured.
+resource "aws_cognito_identity_provider" "google" {
+  count = var.google_client_id == "" ? 0 : 1
+
+  user_pool_id  = aws_cognito_user_pool.main.id
+  provider_name = "Google"
+  provider_type = "Google"
+
+  provider_details = {
+    client_id        = var.google_client_id
+    client_secret    = var.google_client_secret
+    authorize_scopes = "openid email profile"
+  }
+
+  attribute_mapping = {
+    email    = "email"
+    name     = "name"
+    username = "sub"
+  }
+}
+
 resource "aws_cognito_user_pool_client" "spa" {
   name         = "${var.project_name}-${var.environment}-spa"
   user_pool_id = aws_cognito_user_pool.main.id
@@ -59,6 +87,14 @@ resource "aws_cognito_user_pool_client" "spa" {
   # SPA client — no client secret.
   generate_secret = false
 
+  # Hosted-UI OAuth (authorization code + PKCE) for federated sign-in.
+  allowed_oauth_flows                  = ["code"]
+  allowed_oauth_flows_user_pool_client = true
+  allowed_oauth_scopes                 = ["openid", "email", "profile"]
+  supported_identity_providers         = var.google_client_id == "" ? ["COGNITO"] : ["COGNITO", "Google"]
+  callback_urls                        = var.callback_urls
+  logout_urls                          = var.logout_urls
+
   token_validity_units {
     access_token  = "hours"
     id_token      = "hours"
@@ -68,4 +104,7 @@ resource "aws_cognito_user_pool_client" "spa" {
   access_token_validity  = 1
   id_token_validity      = 1
   refresh_token_validity = 30
+
+  # Reference the Google provider only once it exists.
+  depends_on = [aws_cognito_identity_provider.google]
 }

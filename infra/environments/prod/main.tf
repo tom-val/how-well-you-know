@@ -16,8 +16,20 @@ locals {
 module "cognito" {
   source = "../../modules/cognito"
 
-  project_name = local.project_name
-  environment  = local.environment
+  project_name         = local.project_name
+  environment          = local.environment
+  google_client_id     = var.google_client_id
+  google_client_secret = var.google_client_secret
+  callback_urls = [
+    "https://quiz.valiunas.dev/auth/callback",
+    "http://localhost:5173/auth/callback",
+    "http://localhost:5190/auth/callback",
+  ]
+  logout_urls = [
+    "https://quiz.valiunas.dev",
+    "http://localhost:5173",
+    "http://localhost:5190",
+  ]
 }
 
 # --- Persistence (DynamoDB) ---
