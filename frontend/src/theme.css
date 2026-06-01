@@ -79,23 +79,12 @@ html, body {
 
 #root { min-height: 100vh; }
 
-/* warm playful backdrop with soft floating blobs */
+/* clean, calm backdrop — a single flat warm off-white so the cards do the talking */
 .app-bg {
   position: fixed;
   inset: 0;
   z-index: 0;
-  overflow: hidden;
-  background:
-    radial-gradient(1200px 700px at 12% -8%, oklch(0.92 0.07 285 / 0.55), transparent 60%),
-    radial-gradient(1000px 700px at 100% 4%, oklch(0.93 0.06 28 / 0.40), transparent 58%),
-    radial-gradient(900px 800px at 80% 110%, oklch(0.92 0.06 165 / 0.40), transparent 60%),
-    var(--bg);
-}
-.app-bg b {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(2px);
-  opacity: 0.5;
+  background: var(--bg);
 }
 
 h1, h2, h3, h4 {
