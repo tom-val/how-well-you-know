@@ -160,7 +160,9 @@
 @keyframes modalin { from { opacity: 0; transform: translateY(16px) scale(0.97); } to { opacity: 1; transform: none; } }
 @media (max-width: 600px) {
   .modal-scrim { padding: 0; align-items: stretch; }
-  .modal { max-width: none; max-height: none; min-height: 100vh; border-radius: 0; border: none; }
+  /* Fill the visible viewport exactly (dvh accounts for mobile browser chrome) so the
+     body scrolls internally and the footer stays reachable. */
+  .modal { max-width: none; height: 100vh; height: 100dvh; max-height: 100dvh; border-radius: 0; border: none; }
 }
 .modal-head {
   display: flex; align-items: flex-start; justify-content: space-between; gap: 14px;
@@ -170,7 +172,7 @@
 .modal-head .mh-sub { font-size: 13.5px; color: var(--ink-faint); margin-top: 5px; max-width: 90%; }
 .modal-close { border: none; background: var(--surface-3); color: var(--ink-soft); width: 34px; height: 34px; border-radius: 10px; cursor: pointer; display: grid; place-items: center; flex: none; transition: background 0.2s, color 0.2s; }
 .modal-close:hover { background: oklch(0.94 0.02 285); color: var(--ink); }
-.modal-body { padding: 4px 22px 8px; overflow-y: auto; flex: 1; }
+.modal-body { padding: 4px 22px 8px; overflow-y: auto; flex: 1; min-height: 0; }
 
 /* suggest bar (dice + AI) */
 .suggest-bar {
