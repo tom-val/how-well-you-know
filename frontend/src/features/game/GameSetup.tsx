@@ -5,11 +5,12 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useSnackbar } from "notistack";
 import { addQuestion, startGame } from "../../api/gamesApi";
 import type { Game } from "../../api/gamesApi";
+import { suggestQuestion } from "./questionBank";
 
 const NOTATIONS = ["A", "B", "C", "D", "E", "F"];
 
 export function GameSetup({ game }: { game: Game }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const queryClient = useQueryClient();
 
@@ -48,6 +49,14 @@ export function GameSetup({ game }: { game: Game }) {
     e.preventDefault();
     const filled = variants.filter((v) => v.trim()).length;
     if (text.trim() && filled >= 2) addQuestionMutation.mutate();
+  }
+
+  function onSuggest() {
+    const lang = i18n.resolvedLanguage === "lt" ? "lt" : "en";
+    const s = suggestQuestion(lang);
+    setText(s.text);
+    setMultiple(false);
+    setVariants(s.options.length >= 2 ? s.options : [...s.options, ""]);
   }
 
   const canStart = game.players.length >= 2 && game.questions.length >= 2;
@@ -93,7 +102,12 @@ export function GameSetup({ game }: { game: Game }) {
       </section>
 
       <section className="card">
-        <h3>{t("play.addQuestion")}</h3>
+        <div className="form-head">
+          <h3>{t("play.addQuestion")}</h3>
+          <button type="button" className="link-btn" onClick={onSuggest}>
+            🎲 {t("play.suggest")}
+          </button>
+        </div>
         <form onSubmit={onAddQuestion} className="form">
           <label>
             {t("play.questionText")}
