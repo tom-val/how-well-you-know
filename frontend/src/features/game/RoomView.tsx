@@ -55,8 +55,9 @@ export function RoomView({ game }: { game: Game }) {
   };
 
   const canStart = game.players.length >= 2 && game.questions.length >= 2;
-  const meReady = !!user && game.readyUserIds.includes(user.sub);
-  const readyCount = game.readyUserIds.length;
+  const readyIds = game.readyUserIds ?? [];
+  const meReady = !!user && readyIds.includes(user.sub);
+  const readyCount = readyIds.length;
 
   return (
     <div className="page">
@@ -121,7 +122,7 @@ export function RoomView({ game }: { game: Game }) {
               <div className="player-row" key={p.id}>
                 <Avatar name={p.userName} color={playerColor(p.id)} size={34} />
                 <span className="pr-name grow">{p.id === user?.sub ? t.you : p.userName}</span>
-                {game.readyUserIds.includes(p.id) && (
+                {readyIds.includes(p.id) && (
                   <span className="ready-pill"><Icon.check width="13" height="13" />{t.readyState}</span>
                 )}
                 {p.id === game.createdByUser && <span className="host-pill">{t.createdByYou}</span>}
