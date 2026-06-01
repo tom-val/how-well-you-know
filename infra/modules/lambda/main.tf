@@ -76,6 +76,7 @@ resource "aws_lambda_function" "api" {
         DynamoDb__GamesTableName       = var.games_table_name
         DynamoDb__UsersTableName       = var.users_table_name
         DynamoDb__MembershipsTableName = var.memberships_table_name
+        OpenAi__ApiKey                 = var.openai_api_key
       },
       { for i, origin in var.cors_allowed_origins : "Cors__AllowedOrigins__${i}" => origin }
     )

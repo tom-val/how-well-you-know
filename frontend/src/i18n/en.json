@@ -54,6 +54,8 @@
     "noQuestionsYet": "No questions yet.",
     "addQuestion": "Add a question",
     "suggest": "Suggest",
+    "aiSuggest": "AI suggest",
+    "aiUnavailable": "AI unavailable — picked one from the list.",
     "questionText": "Question",
     "variant": "Option {{notation}}",
     "addVariant": "Add option",

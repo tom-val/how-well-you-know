@@ -17,3 +17,11 @@ variable "extra_cors_allowed_origins" {
   type    = list(string)
   default = []
 }
+
+# OpenAI API key for AI question suggestions. Empty disables AI (clients fall back to the
+# static question bank). Set via the OPENAI_API_KEY GitHub secret.
+variable "openai_api_key" {
+  type      = string
+  sensitive = true
+  default   = ""
+}

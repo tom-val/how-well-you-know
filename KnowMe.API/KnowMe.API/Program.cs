@@ -2,6 +2,7 @@ using Amazon.DynamoDBv2;
 using Amazon.Lambda.AspNetCoreServer;
 using FluentValidation;
 using KnowMe.API.Features.Games;
+using KnowMe.API.Features.Suggestions;
 using KnowMe.API.Features.Users;
 using KnowMe.API.Persistence;
 using KnowMe.API.Persistence.Repositories;
@@ -54,6 +55,17 @@ builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 builder.Services.AddScoped<IGameRepository, GameRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 
+// AI question suggestions (inline OpenAI call; short timeout so a slow provider can't
+// hold the request near the API Gateway cap — the client falls back to the static bank).
+builder.Services
+    .AddOptions<OpenAiSettings>()
+    .Bind(builder.Configuration.GetSection(OpenAiSettings.SectionName));
+
+builder.Services.AddHttpClient<IQuestionSuggester, OpenAiQuestionSuggester>(client =>
+{
+    client.Timeout = TimeSpan.FromSeconds(12);
+});
+
 var app = builder.Build();
 
 // Middleware pipeline.
@@ -75,6 +87,7 @@ else
 app.MapGet("/health", () => Results.Ok(new { status = "healthy" }));
 app.MapUserEndpoints();
 app.MapGameEndpoints();
+app.MapSuggestionEndpoints();
 
 app.Run();
 

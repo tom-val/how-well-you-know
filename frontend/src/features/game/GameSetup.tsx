@@ -5,7 +5,9 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useSnackbar } from "notistack";
 import { addQuestion, startGame } from "../../api/gamesApi";
 import type { Game } from "../../api/gamesApi";
+import { suggestAiQuestion } from "../../api/suggestionsApi";
 import { suggestQuestion } from "./questionBank";
+import type { Suggestion } from "./questionBank";
 
 const NOTATIONS = ["A", "B", "C", "D", "E", "F"];
 
@@ -17,6 +19,7 @@ export function GameSetup({ game }: { game: Game }) {
   const [text, setText] = useState("");
   const [multiple, setMultiple] = useState(false);
   const [variants, setVariants] = useState<string[]>(["", ""]);
+  const [aiLoading, setAiLoading] = useState(false);
 
   const invalidate = () => queryClient.invalidateQueries({ queryKey: ["game", game.id] });
   const onError = (err: unknown) =>
@@ -51,12 +54,29 @@ export function GameSetup({ game }: { game: Game }) {
     if (text.trim() && filled >= 2) addQuestionMutation.mutate();
   }
 
-  function onSuggest() {
-    const lang = i18n.resolvedLanguage === "lt" ? "lt" : "en";
-    const s = suggestQuestion(lang);
+  const lang = () => (i18n.resolvedLanguage === "lt" ? "lt" : "en");
+
+  function applySuggestion(s: Suggestion) {
     setText(s.text);
     setMultiple(false);
     setVariants(s.options.length >= 2 ? s.options : [...s.options, ""]);
+  }
+
+  function onSuggest() {
+    applySuggestion(suggestQuestion(lang()));
+  }
+
+  async function onAiSuggest() {
+    setAiLoading(true);
+    try {
+      applySuggestion(await suggestAiQuestion(lang()));
+    } catch {
+      // AI unavailable — fall back to the static bank so the button always works.
+      applySuggestion(suggestQuestion(lang()));
+      enqueueSnackbar(t("play.aiUnavailable"), { variant: "info" });
+    } finally {
+      setAiLoading(false);
+    }
   }
 
   const canStart = game.players.length >= 2 && game.questions.length >= 2;
@@ -104,9 +124,14 @@ export function GameSetup({ game }: { game: Game }) {
       <section className="card">
         <div className="form-head">
           <h3>{t("play.addQuestion")}</h3>
-          <button type="button" className="link-btn" onClick={onSuggest}>
-            🎲 {t("play.suggest")}
-          </button>
+          <div className="suggest-actions">
+            <button type="button" className="link-btn" onClick={onSuggest}>
+              🎲 {t("play.suggest")}
+            </button>
+            <button type="button" className="link-btn" onClick={onAiSuggest} disabled={aiLoading}>
+              ✨ {aiLoading ? t("common.loading") : t("play.aiSuggest")}
+            </button>
+          </div>
         </div>
         <form onSubmit={onAddQuestion} className="form">
           <label>

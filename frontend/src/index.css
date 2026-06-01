@@ -325,6 +325,10 @@ button.primary.block {
   gap: 1rem;
   margin-bottom: 0.75rem;
 }
+.suggest-actions {
+  display: flex;
+  gap: 1rem;
+}
 .setup-actions {
   display: flex;
   align-items: center;

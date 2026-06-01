@@ -84,6 +84,7 @@ module "lambda" {
   memberships_table_name    = module.dynamodb.memberships_table_name
   memberships_table_arn     = module.dynamodb.memberships_table_arn
   cors_allowed_origins      = local.cors_allowed_origins
+  openai_api_key            = var.openai_api_key
 }
 
 module "api_gateway" {

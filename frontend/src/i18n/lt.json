@@ -54,6 +54,8 @@
     "noQuestionsYet": "Dar nėra klausimų.",
     "addQuestion": "Pridėti klausimą",
     "suggest": "Pasiūlyti",
+    "aiSuggest": "AI pasiūlymas",
+    "aiUnavailable": "AI nepasiekiamas — parinkome iš sąrašo.",
     "questionText": "Klausimas",
     "variant": "Variantas {{notation}}",
     "addVariant": "Pridėti variantą",

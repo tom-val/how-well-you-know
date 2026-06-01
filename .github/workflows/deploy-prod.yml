@@ -59,6 +59,9 @@ jobs:
 
       - name: Terraform Apply
         run: terraform apply -auto-approve -input=false
+        env:
+          # Optional — empty disables AI suggestions (clients fall back to the static bank).
+          TF_VAR_openai_api_key: ${{ secrets.OPENAI_API_KEY }}
 
       - name: Export outputs
         id: outputs
