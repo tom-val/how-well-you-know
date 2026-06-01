@@ -96,7 +96,7 @@ export function RoomView({ game }: { game: Game }) {
                     <div className="grow">
                       <div className="q-text">{q.text}</div>
                       <div className="q-opts">
-                        {q.variants.map((o, j) => <span className="q-opt" key={o.id}>{ALPHA[j]} · {o.text}</span>)}
+                        {q.variants.map((o) => <span className="q-opt" key={o.id}>{o.notation} · {o.text}</span>)}
                         {q.multipleAnswers && <span className="badge tag" style={{ padding: "3px 9px", fontSize: 11 }}>{t.multiTag}</span>}
                       </div>
                     </div>
