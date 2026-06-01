@@ -42,6 +42,13 @@ variable "connections_table_arn" {
   type = string
 }
 
+# Whether real-time WebSocket broadcasting is wired up. Known at plan time so it can gate
+# the ManageConnections policy (the ARN itself is only known after apply).
+variable "ws_enabled" {
+  type    = bool
+  default = false
+}
+
 # https:// endpoint used to push messages to WebSocket connections. Empty disables broadcasting.
 variable "ws_management_endpoint" {
   type    = string

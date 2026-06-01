@@ -97,6 +97,7 @@ module "lambda" {
   memberships_table_arn     = module.dynamodb.memberships_table_arn
   connections_table_name    = module.dynamodb.connections_table_name
   connections_table_arn     = module.dynamodb.connections_table_arn
+  ws_enabled                = true
   ws_management_endpoint    = module.websocket.management_endpoint
   ws_manage_connections_arn = module.websocket.manage_connections_arn
   cors_allowed_origins      = local.cors_allowed_origins

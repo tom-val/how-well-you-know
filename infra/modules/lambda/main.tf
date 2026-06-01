@@ -57,7 +57,7 @@ resource "aws_iam_role_policy" "dynamodb" {
 
 # Allow the API to push "game-changed" signals to live WebSocket connections.
 resource "aws_iam_role_policy" "manage_connections" {
-  count = var.ws_manage_connections_arn == "" ? 0 : 1
+  count = var.ws_enabled ? 1 : 0
 
   name = "${var.project_name}-${var.environment}-lambda-ws"
   role = aws_iam_role.lambda_execution.id
