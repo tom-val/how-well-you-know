@@ -89,19 +89,12 @@
 
 /* ---------- ROOM ---------- */
 .room-grid { display: grid; grid-template-columns: 1.55fr 1fr; gap: 18px; align-items: start; }
+/* Let tracks shrink below their content's intrinsic width (the long join URL) instead of overflowing. */
+.room-grid > * { min-width: 0; }
 @media (max-width: 820px) { .room-grid { grid-template-columns: 1fr; } }
 
 .invite-card { padding: 20px; }
-.invite-link {
-  display: flex; align-items: center; gap: 10px;
-  background: var(--surface-3); border: 1px solid var(--line);
-  border-radius: var(--r-md); padding: 11px 14px; margin-top: 12px;
-}
-.invite-link code {
-  font-family: 'SF Mono', ui-monospace, monospace;
-  font-size: 13px; color: var(--ink-soft); flex: 1;
-  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-}
+.invite-btn { margin-top: 14px; }
 
 .players-card { padding: 20px; }
 .player-row { display: flex; align-items: center; gap: 11px; padding: 9px 0; }

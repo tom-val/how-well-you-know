@@ -67,12 +67,9 @@ export function RoomView({ game }: { game: Game }) {
               <h3 style={{ fontSize: 17 }}>{t.inviteTitle}</h3>
             </div>
             <div className="mh-sub" style={{ fontSize: 13.5, color: "var(--ink-faint)" }}>{t.inviteSub}</div>
-            <div className="invite-link">
-              <code>{link}</code>
-              <button className="btn btn-soft btn-sm" onClick={copy} style={{ flex: "none" }}>
-                {copied ? <><Icon.check />{t.copied}</> : <><Icon.copy />{t.copyLink}</>}
-              </button>
-            </div>
+            <button className="btn btn-soft btn-block invite-btn" onClick={copy}>
+              {copied ? <><Icon.check />{t.copied}</> : <><Icon.copy />{t.copyLink}</>}
+            </button>
           </div>
 
           <div className="card card-pad enter enter-d1">
