@@ -12,7 +12,14 @@ namespace KnowMe.API.Persistence.Repositories;
 /// Denormalised summary of a game a user belongs to, read from the memberships index
 /// so a player's games can be listed without scanning every game.
 /// </summary>
-public record GameMembership(Guid GameId, string Name, string Status, Guid CreatedByUser, DateTimeOffset CreatedAt);
+public record GameMembership(
+    Guid GameId,
+    string Name,
+    string Status,
+    Guid CreatedByUser,
+    DateTimeOffset CreatedAt,
+    int QuestionCount,
+    int PlayerCount);
 
 public interface IGameRepository
 {
@@ -49,6 +56,8 @@ public class GameRepository : IGameRepository
     private const string StatusAttribute = "status";
     private const string CreatedByAttribute = "created_by_user";
     private const string CreatedAtAttribute = "created_at";
+    private const string QuestionCountAttribute = "question_count";
+    private const string PlayerCountAttribute = "player_count";
 
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
 
@@ -134,7 +143,9 @@ public class GameRepository : IGameRepository
                     [NameAttribute] = new() { S = game.Name },
                     [StatusAttribute] = new() { S = game.Status.ToString() },
                     [CreatedByAttribute] = new() { S = game.CreatedByUser.ToString() },
-                    [CreatedAtAttribute] = new() { S = game.CreatedAt.ToString("O") }
+                    [CreatedAtAttribute] = new() { S = game.CreatedAt.ToString("O") },
+                    [QuestionCountAttribute] = new() { N = game.Questions.Count.ToString() },
+                    [PlayerCountAttribute] = new() { N = game.Players.Count.ToString() }
                 }
             }
         }));
@@ -173,7 +184,9 @@ public class GameRepository : IGameRepository
                 item[NameAttribute].S,
                 item[StatusAttribute].S,
                 Guid.Parse(item[CreatedByAttribute].S),
-                DateTimeOffset.Parse(item[CreatedAtAttribute].S)))
+                DateTimeOffset.Parse(item[CreatedAtAttribute].S),
+                item.TryGetValue(QuestionCountAttribute, out var qc) ? int.Parse(qc.N) : 0,
+                item.TryGetValue(PlayerCountAttribute, out var pc) ? int.Parse(pc.N) : 0))
             .ToList();
     }
 }

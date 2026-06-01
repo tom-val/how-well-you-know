@@ -278,6 +278,22 @@ public class Game
         return Result<Game>.Success(this);
     }
 
+    public Result<Game> RemoveQuestion(Guid questionId)
+    {
+        if (Status != GameStatus.Created)
+        {
+            return Result<Game>.Failure([new ValidationError
+            {
+                Message = "Cannot remove questions after the game has started"
+            }]);
+        }
+
+        Questions.RemoveAll(q => q.Id == questionId);
+
+        //TODO Domain event that question removed
+        return Result<Game>.Success(this);
+    }
+
     public Result<Game> StartGame()
     {
         var errors = new List<ValidationError>();

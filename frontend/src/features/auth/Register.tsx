@@ -1,13 +1,13 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useTranslation } from "react-i18next";
 import { useSnackbar } from "notistack";
 import { useAuth } from "../../hooks/useAuth";
-import { LanguageSwitcher } from "../../components/LanguageSwitcher";
+import { useLang } from "../../i18n/lang";
+import { AuthCard } from "./AuthCard";
 
 export default function Register() {
-  const { t } = useTranslation();
+  const { t } = useLang();
   const { signUp, confirmSignUp } = useAuth();
   const { enqueueSnackbar } = useSnackbar();
   const navigate = useNavigate();
@@ -26,9 +26,7 @@ export default function Register() {
       await signUp(email, password, displayName);
       setAwaitingCode(true);
     } catch (err) {
-      enqueueSnackbar(err instanceof Error ? err.message : t("common.error"), {
-        variant: "error",
-      });
+      enqueueSnackbar(err instanceof Error ? err.message : t.error, { variant: "error" });
     } finally {
       setBusy(false);
     }
@@ -39,88 +37,54 @@ export default function Register() {
     setBusy(true);
     try {
       await confirmSignUp(email, code);
-      enqueueSnackbar(t("auth.confirmedNowSignIn"), { variant: "success" });
+      enqueueSnackbar(t.confirmedNowSignIn, { variant: "success" });
       navigate("/login", { replace: true });
     } catch (err) {
-      enqueueSnackbar(err instanceof Error ? err.message : t("common.error"), {
-        variant: "error",
-      });
+      enqueueSnackbar(err instanceof Error ? err.message : t.error, { variant: "error" });
     } finally {
       setBusy(false);
     }
   }
 
-  return (
-    <div className="auth-page">
-      <div className="auth-card">
-        <div className="auth-top">
-          <LanguageSwitcher />
-        </div>
+  if (awaitingCode) {
+    return (
+      <AuthCard title={t.confirmTitle} subtitle={t.confirmHint}>
+        <form className="stack" style={{ gap: 14 }} onSubmit={onConfirm}>
+          <div>
+            <label className="field-lbl">{t.codeLabel}</label>
+            <input className="input" inputMode="numeric" value={code} onChange={(e) => setCode(e.target.value)} required />
+          </div>
+          <button className="btn btn-primary btn-lg btn-block" type="submit" disabled={busy}>
+            {busy ? t.confirming : t.confirm}
+          </button>
+        </form>
+      </AuthCard>
+    );
+  }
 
-        {!awaitingCode ? (
-          <>
-            <h1>{t("auth.signUp")}</h1>
-            <form onSubmit={onSignUp} className="form">
-              <label>
-                {t("auth.displayNameLabel")}
-                <input
-                  type="text"
-                  value={displayName}
-                  onChange={(e) => setDisplayName(e.target.value)}
-                  autoComplete="nickname"
-                  required
-                />
-              </label>
-              <label>
-                {t("auth.emailLabel")}
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  autoComplete="email"
-                  required
-                />
-              </label>
-              <label>
-                {t("auth.passwordLabel")}
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  autoComplete="new-password"
-                  required
-                />
-              </label>
-              <button type="submit" className="primary" disabled={busy}>
-                {busy ? t("auth.signingUp") : t("auth.signUp")}
-              </button>
-            </form>
-            <p className="muted">
-              {t("auth.haveAccount")} <Link to="/login">{t("auth.signIn")}</Link>
-            </p>
-          </>
-        ) : (
-          <>
-            <h1>{t("auth.confirmTitle")}</h1>
-            <p className="muted">{t("auth.confirmHint")}</p>
-            <form onSubmit={onConfirm} className="form">
-              <label>
-                {t("auth.codeLabel")}
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  value={code}
-                  onChange={(e) => setCode(e.target.value)}
-                  required
-                />
-              </label>
-              <button type="submit" className="primary" disabled={busy}>
-                {busy ? t("auth.confirming") : t("auth.confirm")}
-              </button>
-            </form>
-          </>
-        )}
-      </div>
-    </div>
+  return (
+    <AuthCard title={t.signUp}>
+      <form className="stack" style={{ gap: 14 }} onSubmit={onSignUp}>
+        <div>
+          <label className="field-lbl">{t.displayNameLabel}</label>
+          <input className="input" type="text" autoComplete="nickname" value={displayName} onChange={(e) => setDisplayName(e.target.value)} required />
+        </div>
+        <div>
+          <label className="field-lbl">{t.emailLabel}</label>
+          <input className="input" type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+        </div>
+        <div>
+          <label className="field-lbl">{t.passwordLabel}</label>
+          <input className="input" type="password" autoComplete="new-password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+        </div>
+        <button className="btn btn-primary btn-lg btn-block" type="submit" disabled={busy}>
+          {busy ? t.signingUp : t.signUp}
+        </button>
+      </form>
+      <p className="muted" style={{ marginTop: 16, fontSize: 14 }}>
+        {t.haveAccount}{" "}
+        <Link to="/login" className="lnk" style={{ display: "inline" }}>{t.signIn}</Link>
+      </p>
+    </AuthCard>
   );
 }

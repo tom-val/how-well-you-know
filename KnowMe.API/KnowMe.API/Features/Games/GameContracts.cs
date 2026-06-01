@@ -135,7 +135,9 @@ public record GameSummaryResponse(
     string Name,
     string Status,
     Guid CreatedByUser,
-    DateTimeOffset CreatedAt);
+    DateTimeOffset CreatedAt,
+    int QuestionCount,
+    int PlayerCount);
 
 // --- Results ---
 // Only answered questions are included, so revealing the actual picks and guesses here

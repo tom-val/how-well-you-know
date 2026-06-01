@@ -18,6 +18,7 @@ public static class GameEndpoints
         group.MapGet("/{id:guid}/results", GetResults);
         group.MapPost("/{id:guid}/join", JoinGame);
         group.MapPost("/{id:guid}/questions", AddQuestion);
+        group.MapDelete("/{id:guid}/questions/{questionId:guid}", RemoveQuestion);
         group.MapPost("/{id:guid}/start", StartGame);
         group.MapPost("/{id:guid}/choices", RecordChoice);
         group.MapPost("/{id:guid}/guesses", RecordGuess);
@@ -70,7 +71,7 @@ public static class GameEndpoints
 
         var summaries = memberships
             .OrderByDescending(m => m.CreatedAt)
-            .Select(m => new GameSummaryResponse(m.GameId, m.Name, m.Status, m.CreatedByUser, m.CreatedAt))
+            .Select(m => new GameSummaryResponse(m.GameId, m.Name, m.Status, m.CreatedByUser, m.CreatedAt, m.QuestionCount, m.PlayerCount))
             .ToList();
 
         return Results.Ok(summaries);
@@ -140,6 +141,25 @@ public static class GameEndpoints
 
         await games.SaveAsync(game, cancellationToken);
         return Results.Created($"/v1/games/{game.Id}", QuestionResponse.From(questionResult.Value));
+    }
+
+    private static async Task<IResult> RemoveQuestion(
+        Guid id,
+        Guid questionId,
+        IGameRepository games,
+        HttpContext context,
+        CancellationToken cancellationToken)
+    {
+        var game = await games.GetAsync(id, cancellationToken);
+        if (game is null)
+            return Results.NotFound(new { error = "Game not found." });
+
+        var result = game.RemoveQuestion(questionId);
+        if (!result.IsSuccess)
+            return ApiResults.DomainValidationProblem(result.Errors!);
+
+        await games.SaveAsync(game, cancellationToken);
+        return Results.Ok(GameResponse.From(game, context.GetUserId()));
     }
 
     private static async Task<IResult> StartGame(

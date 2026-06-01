@@ -1,17 +1,17 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useTranslation } from "react-i18next";
 import { useSnackbar } from "notistack";
 import { useAuth } from "../../hooks/useAuth";
-import { LanguageSwitcher } from "../../components/LanguageSwitcher";
+import { useLang } from "../../i18n/lang";
+import { AuthCard } from "./AuthCard";
 
 interface LocationState {
   from?: { pathname: string };
 }
 
 export default function Login() {
-  const { t } = useTranslation();
+  const { t } = useLang();
   const { signIn } = useAuth();
   const { enqueueSnackbar } = useSnackbar();
   const navigate = useNavigate();
@@ -30,51 +30,31 @@ export default function Login() {
       await signIn(email, password);
       navigate(redirectTo, { replace: true });
     } catch (err) {
-      enqueueSnackbar(err instanceof Error ? err.message : t("common.error"), {
-        variant: "error",
-      });
+      enqueueSnackbar(err instanceof Error ? err.message : t.error, { variant: "error" });
     } finally {
       setBusy(false);
     }
   }
 
   return (
-    <div className="auth-page">
-      <div className="auth-card">
-        <div className="auth-top">
-          <LanguageSwitcher />
+    <AuthCard title={t.brand} subtitle={t.tagline}>
+      <form className="stack" style={{ gap: 14 }} onSubmit={onSubmit}>
+        <div>
+          <label className="field-lbl">{t.emailLabel}</label>
+          <input className="input" type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
         </div>
-        <h1>{t("app.title")}</h1>
-        <p className="muted">{t("app.tagline")}</p>
-        <form onSubmit={onSubmit} className="form">
-          <label>
-            {t("auth.emailLabel")}
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              autoComplete="email"
-              required
-            />
-          </label>
-          <label>
-            {t("auth.passwordLabel")}
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              autoComplete="current-password"
-              required
-            />
-          </label>
-          <button type="submit" className="primary" disabled={busy}>
-            {busy ? t("auth.signingIn") : t("auth.signIn")}
-          </button>
-        </form>
-        <p className="muted">
-          {t("auth.noAccount")} <Link to="/register">{t("auth.signUp")}</Link>
-        </p>
-      </div>
-    </div>
+        <div>
+          <label className="field-lbl">{t.passwordLabel}</label>
+          <input className="input" type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+        </div>
+        <button className="btn btn-primary btn-lg btn-block" type="submit" disabled={busy}>
+          {busy ? t.signingIn : t.signIn}
+        </button>
+      </form>
+      <p className="muted" style={{ marginTop: 16, fontSize: 14 }}>
+        {t.noAccount}{" "}
+        <Link to="/register" className="lnk" style={{ display: "inline" }}>{t.signUp}</Link>
+      </p>
+    </AuthCard>
   );
 }

@@ -1,61 +1,35 @@
-import { Link, useParams } from "react-router-dom";
-import { useTranslation } from "react-i18next";
+import { useNavigate, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { getGame } from "../../api/gamesApi";
-import { Spinner } from "../../components/Spinner";
-import { GameSetup } from "./GameSetup";
-import { AnswerPhase } from "./AnswerPhase";
-import { ReviewPhase } from "./ReviewPhase";
-import { FinalResults } from "./FinalResults";
+import { useLang } from "../../i18n/lang";
+import { Icon, Spinner } from "../../components/ui";
+import { RoomView } from "./RoomView";
+import { ActiveView } from "./ActiveView";
+import { FinishedView } from "./FinishedView";
 
 export default function GamePage() {
-  const { t } = useTranslation();
+  const { t } = useLang();
   const { id = "" } = useParams();
+  const navigate = useNavigate();
 
-  // Poll so other players' moves / phase changes show up live (no WebSockets yet).
   const gameQuery = useQuery({
     queryKey: ["game", id],
     queryFn: () => getGame(id),
-    refetchInterval: 4000,
+    refetchInterval: (query) => (query.state.data?.status === "Ended" ? false : 5000),
   });
 
-  if (gameQuery.isLoading) return <Spinner />;
+  if (gameQuery.isLoading) return <div className="page"><Spinner t={t} /></div>;
   if (gameQuery.isError || !gameQuery.data) {
     return (
       <div className="page">
-        <p className="error-text">{t("common.error")}</p>
-        <Link to="/" className="link-btn">
-          ← {t("game.back")}
-        </Link>
+        <p className="error-text muted">{t.error}</p>
+        <button className="lnk" onClick={() => navigate("/")}><Icon.arrowL />{t.back}</button>
       </div>
     );
   }
 
   const game = gameQuery.data;
-  const currentQuestion = game.questions.find((q) => q.id === game.currentQuestionId);
-
-  return (
-    <div className="game-view">
-      <div className="game-head">
-        <Link to="/" className="link-btn">
-          ← {t("game.back")}
-        </Link>
-        <span className="players-count">
-          {t("game.players")}: {game.players.length}
-        </span>
-      </div>
-      <h1 className="game-title">{game.name}</h1>
-
-      {game.status === "Created" && <GameSetup game={game} />}
-
-      {game.status === "Started" &&
-        (game.currentQuestionPhase === "Answering" && currentQuestion ? (
-          <AnswerPhase game={game} question={currentQuestion} />
-        ) : (
-          <ReviewPhase game={game} />
-        ))}
-
-      {game.status === "Ended" && <FinalResults game={game} />}
-    </div>
-  );
+  if (game.status === "Started") return <ActiveView game={game} />;
+  if (game.status === "Ended") return <FinishedView game={game} />;
+  return <RoomView game={game} />;
 }

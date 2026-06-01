@@ -48,6 +48,8 @@ export interface GameSummary {
   status: GameStatus;
   createdByUser: string;
   createdAt: string;
+  questionCount: number;
+  playerCount: number;
 }
 
 export interface ScoreResult {
@@ -128,6 +130,11 @@ export async function addQuestion(
     multipleAnswers,
     variants,
   });
+  return data;
+}
+
+export async function deleteQuestion(gameId: string, questionId: string): Promise<Game> {
+  const { data } = await apiClient.delete<Game>(`/v1/games/${gameId}/questions/${questionId}`);
   return data;
 }
 
