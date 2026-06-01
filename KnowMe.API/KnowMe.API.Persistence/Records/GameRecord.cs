@@ -31,6 +31,7 @@ public record QuestionRecord
     public Guid Id { get; init; }
     public string Text { get; init; } = string.Empty;
     public bool MultipleAnswers { get; init; }
+    public int Order { get; init; }
     public Guid CreatedByUser { get; init; }
     public DateTimeOffset CreatedAt { get; init; }
     public Guid GameId { get; init; }

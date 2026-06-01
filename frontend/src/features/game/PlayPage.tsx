@@ -20,6 +20,10 @@ export default function PlayPage() {
   const gameQuery = useQuery({ queryKey: ["game", id], queryFn: () => getGame(id), refetchInterval: 3500 });
   const game = gameQuery.data;
 
+  // live scores for the header scoreboard (results works mid-game)
+  const scoresQuery = useQuery({ queryKey: ["results", id], queryFn: () => getResults(id), refetchInterval: 4000 });
+  const scoreOf = (uid: string) => scoresQuery.data?.overall.find((s) => s.userId === uid)?.totalScore ?? 0;
+
   const refresh = () => queryClient.invalidateQueries({ queryKey: ["game", id] });
   const onErr = (err: unknown) => enqueueSnackbar(err instanceof Error ? err.message : t.error, { variant: "error" });
 
@@ -59,7 +63,19 @@ export default function PlayPage() {
       {game.questions.map((q, i) => <i key={q.id} className={q.answered ? "done" : i === qIndex ? "on" : ""}></i>)}
     </div>
   );
-  const headRight = <span className="chip">{t.players}: {game.players.length}</span>;
+  const headRight = (
+    <div className="score-strip">
+      {[...game.players]
+        .sort((a, b) => scoreOf(b.id) - scoreOf(a.id))
+        .map((p) => (
+          <span className={`score-pill ${p.id === user?.sub ? "me" : ""}`} key={p.id} title={p.userName}>
+            <Avatar name={p.userName} color={playerColor(p.id)} size={20} />
+            <span className="sp-name">{p.id === user?.sub ? t.you : p.userName}</span>
+            <b className="sp-score">{scoreOf(p.id)}</b>
+          </span>
+        ))}
+    </div>
+  );
 
   // ---- REVIEW ----
   if (game.currentQuestionPhase === "Review") {
@@ -215,9 +231,19 @@ function AnswerCard({ question, multi, submitting, t, guess, lastTarget, onSubmi
 
 /* ---- review body: fetch results, reveal current question ---- */
 function ReviewBody({ gameId, questionId, game, meId, t }: { gameId: string; questionId: string; game: Game; meId?: string; t: ReturnType<typeof useLang>["t"] }) {
-  const resultsQuery = useQuery({ queryKey: ["results", gameId], queryFn: () => getResults(gameId) });
-  if (resultsQuery.isLoading || !resultsQuery.data) return <Spinner t={t} />;
-  const result = resultsQuery.data.questions.find((q) => q.questionId === questionId);
-  if (!result) return null;
+  // Key by question + always refetch on mount: when a new question enters review we must
+  // fetch fresh results (the shared cache may predate this question being answered).
+  // Keep polling until the just-answered question shows up in the results.
+  const resultsQuery = useQuery({
+    queryKey: ["results", gameId, questionId],
+    queryFn: () => getResults(gameId),
+    staleTime: 0,
+    refetchOnMount: "always",
+    refetchInterval: (query) =>
+      query.state.data?.questions.some((q) => q.questionId === questionId) ? false : 2000,
+  });
+
+  const result = resultsQuery.data?.questions.find((q) => q.questionId === questionId);
+  if (!result) return <Spinner t={t} />;
   return <QuestionReveal result={result} players={game.players} meId={meId} t={t} />;
 }

@@ -200,7 +200,7 @@ public class Game
             return Result<Game>.Failure(errors);
         }
 
-        var newQuestion = Questions.OrderBy(q => q.Id).FirstOrDefault(q => !q.Answered);
+        var newQuestion = Questions.OrderBy(q => q.Order).FirstOrDefault(q => !q.Answered);
 
         //If no new questions, game is finished
         if (newQuestion is null)
@@ -272,6 +272,7 @@ public class Game
             }]);
         }
 
+        question.Order = Questions.Count == 0 ? 0 : Questions.Max(q => q.Order) + 1;
         Questions.Add(question);
 
         //TODO Domain event that question added
@@ -329,7 +330,7 @@ public class Game
 
         Status = GameStatus.Started;
         CurrentQuestionPhase = QuestionPhase.Answering;
-        CurrentQuestionId = Questions.OrderBy(q => q.Id).First().Id;
+        CurrentQuestionId = Questions.OrderBy(q => q.Order).First().Id;
 
 
         //TODO Domain event that game started

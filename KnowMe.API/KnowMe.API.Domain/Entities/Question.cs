@@ -7,6 +7,7 @@ public class Question
     public Guid Id { get; private set;}
     public string Text { get; private set; }
     public bool MultipleAnswers { get; private set; }
+    public int Order { get; internal set; }
     public Guid CreatedByUser { get; private set; }
     public DateTimeOffset CreatedAt { get; private set; }
     public List<QuestionVariant> AnswerVariants { get; private set; } = new List<QuestionVariant>();
@@ -191,6 +192,7 @@ public class Question
         Guid id,
         string text,
         bool multipleAnswers,
+        int order,
         Guid createdByUser,
         DateTimeOffset createdAt,
         Guid gameId,
@@ -202,6 +204,7 @@ public class Question
             Id = id,
             Text = text,
             MultipleAnswers = multipleAnswers,
+            Order = order,
             CreatedByUser = createdByUser,
             CreatedAt = createdAt,
             GameId = gameId,
