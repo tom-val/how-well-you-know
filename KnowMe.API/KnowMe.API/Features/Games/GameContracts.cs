@@ -58,7 +58,8 @@ public record GameResponse(
     Guid CreatedByUser,
     IReadOnlyList<UserResponse> Players,
     IReadOnlyList<QuestionResponse> Questions,
-    ViewerState? Viewer)
+    ViewerState? Viewer,
+    IReadOnlyList<Guid> AwaitingPlayerIds)
 {
     public static GameResponse From(Game game, Guid viewerId) => new(
         game.Id,
@@ -69,16 +70,12 @@ public record GameResponse(
         game.CreatedByUser,
         game.Players.Select(UserResponse.From).ToList(),
         game.Questions.Select(QuestionResponse.From).ToList(),
-        BuildViewer(game, viewerId));
+        BuildViewer(game, viewerId),
+        BuildAwaiting(game));
 
     private static ViewerState? BuildViewer(Game game, Guid viewerId)
     {
-        if (game.Status != GameStatus.Started)
-        {
-            return null;
-        }
-
-        var current = game.Questions.FirstOrDefault(q => q.Id == game.CurrentQuestionId);
+        var current = CurrentQuestion(game);
         if (current is null)
         {
             return null;
@@ -91,6 +88,44 @@ public record GameResponse(
                 .Select(g => g.ChoiceUserId)
                 .ToList());
     }
+
+    // Players who still owe a choice and/or a guess on the current question.
+    // Reveals completion status only (never answer content), so it's safe mid-question.
+    private static IReadOnlyList<Guid> BuildAwaiting(Game game)
+    {
+        if (game.CurrentQuestionPhase != QuestionPhase.Answering)
+        {
+            return [];
+        }
+
+        var current = CurrentQuestion(game);
+        if (current is null)
+        {
+            return [];
+        }
+
+        return game.Players
+            .Where(p => !HasFinished(current, game.Players, p.Id))
+            .Select(p => p.Id)
+            .ToList();
+    }
+
+    private static bool HasFinished(Question question, IReadOnlyList<User> players, Guid userId)
+    {
+        if (!question.UserChoices.Any(c => c.UserId == userId))
+        {
+            return false;
+        }
+
+        return players
+            .Where(o => o.Id != userId)
+            .All(o => question.UserGuesses.Any(g => g.GuessingUserId == userId && g.ChoiceUserId == o.Id));
+    }
+
+    private static Question? CurrentQuestion(Game game) =>
+        game.Status == GameStatus.Started
+            ? game.Questions.FirstOrDefault(q => q.Id == game.CurrentQuestionId)
+            : null;
 }
 
 // --- Summaries (list my games) ---
@@ -103,14 +138,26 @@ public record GameSummaryResponse(
     DateTimeOffset CreatedAt);
 
 // --- Results ---
+// Only answered questions are included, so revealing the actual picks and guesses here
+// never leaks anything that's still in play.
 
 public record ScoreResponse(Guid UserId, int TotalScore, int Rank);
 
-public record GuessResultResponse(Guid ChoiceUserId, int Score);
+public record VariantRef(string Notation, string Text);
+
+/// <summary>What a player actually picked for a question.</summary>
+public record AnswerReveal(Guid UserId, IReadOnlyList<VariantRef> Picked);
+
+/// <summary>What a player guessed another player picked, and the points it scored.</summary>
+public record GuessResultResponse(Guid ChoiceUserId, int Score, IReadOnlyList<VariantRef> Guessed);
 
 public record PlayerQuestionResultResponse(Guid UserId, int TotalScore, IReadOnlyList<GuessResultResponse> Guesses);
 
-public record QuestionResultResponse(Guid QuestionId, string Text, IReadOnlyList<PlayerQuestionResultResponse> Players);
+public record QuestionResultResponse(
+    Guid QuestionId,
+    string Text,
+    IReadOnlyList<AnswerReveal> Answers,
+    IReadOnlyList<PlayerQuestionResultResponse> Players);
 
 public record ResultsResponse(IReadOnlyList<ScoreResponse> Overall, IReadOnlyList<QuestionResultResponse> Questions)
 {
@@ -122,17 +169,42 @@ public record ResultsResponse(IReadOnlyList<ScoreResponse> Overall, IReadOnlyLis
 
         var questions = game.Questions
             .Where(q => q.Answered)
-            .Select(q => new QuestionResultResponse(
-                q.Id,
-                q.Text,
-                q.GetUserResults().Value
-                    .Select(u => new PlayerQuestionResultResponse(
-                        u.UserId,
-                        u.TotalScore,
-                        u.GuessResults.Select(g => new GuessResultResponse(g.ChoiceUser, g.Score)).ToList()))
-                    .ToList()))
+            .Select(BuildQuestionResult)
             .ToList();
 
         return new ResultsResponse(overall, questions);
     }
+
+    private static QuestionResultResponse BuildQuestionResult(Question question)
+    {
+        var variantById = question.AnswerVariants.ToDictionary(
+            v => v.Id,
+            v => new VariantRef(v.Notation.ToString(), v.Text));
+
+        var answers = question.UserChoices
+            .Select(c => new AnswerReveal(c.UserId, MapVariants(c.SelectedVariantsIds, variantById)))
+            .ToList();
+
+        var players = question.GetUserResults().Value
+            .Select(u => new PlayerQuestionResultResponse(
+                u.UserId,
+                u.TotalScore,
+                u.GuessResults.Select(g =>
+                {
+                    var guess = question.UserGuesses
+                        .First(x => x.GuessingUserId == g.GuessingUser && x.ChoiceUserId == g.ChoiceUser);
+                    return new GuessResultResponse(g.ChoiceUser, g.Score, MapVariants(guess.SelectedVariantsIds, variantById));
+                }).ToList()))
+            .ToList();
+
+        return new QuestionResultResponse(question.Id, question.Text, answers, players);
+    }
+
+    private static IReadOnlyList<VariantRef> MapVariants(
+        IEnumerable<Guid> variantIds, Dictionary<Guid, VariantRef> variantById) =>
+        variantIds
+            .Where(variantById.ContainsKey)
+            .Select(id => variantById[id])
+            .OrderBy(v => v.Notation)
+            .ToList();
 }

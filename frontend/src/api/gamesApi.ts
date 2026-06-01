@@ -28,6 +28,7 @@ export interface Game {
   players: Player[];
   questions: Question[];
   viewer: ViewerState | null;
+  awaitingPlayerIds: string[];
 }
 
 export interface Player {
@@ -55,9 +56,20 @@ export interface ScoreResult {
   rank: number;
 }
 
+export interface VariantRef {
+  notation: string;
+  text: string;
+}
+
+export interface AnswerReveal {
+  userId: string;
+  picked: VariantRef[];
+}
+
 export interface GuessResult {
   choiceUserId: string;
   score: number;
+  guessed: VariantRef[];
 }
 
 export interface PlayerQuestionResult {
@@ -69,6 +81,7 @@ export interface PlayerQuestionResult {
 export interface QuestionResult {
   questionId: string;
   text: string;
+  answers: AnswerReveal[];
   players: PlayerQuestionResult[];
 }
 

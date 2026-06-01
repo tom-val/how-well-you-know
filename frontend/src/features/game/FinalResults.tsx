@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getResults } from "../../api/gamesApi";
 import type { Game } from "../../api/gamesApi";
 import { Spinner } from "../../components/Spinner";
+import { QuestionResultCard } from "./QuestionResultCard";
 
 export function FinalResults({ game }: { game: Game }) {
   const { t } = useTranslation();
@@ -15,6 +16,7 @@ export function FinalResults({ game }: { game: Game }) {
   if (resultsQuery.isLoading) return <Spinner />;
 
   const overall = (resultsQuery.data?.overall ?? []).slice().sort((a, b) => a.rank - b.rank);
+  const questions = resultsQuery.data?.questions ?? [];
 
   return (
     <div className="page">
@@ -31,6 +33,11 @@ export function FinalResults({ game }: { game: Game }) {
           ))}
         </ol>
       </section>
+
+      <h3 className="section-title">{t("play.review")}</h3>
+      {questions.map((q) => (
+        <QuestionResultCard key={q.questionId} result={q} nameOf={nameOf} />
+      ))}
 
       <Link to="/" className="link-btn">
         ← {t("play.backToLobby")}

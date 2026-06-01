@@ -82,9 +82,16 @@ function GuessSection({
   const remaining = game.players.filter((p) => p.id !== myId && !guessedUserIds.includes(p.id));
 
   if (remaining.length === 0) {
+    const waitingFor = game.awaitingPlayerIds
+      .filter((id) => id !== myId)
+      .map((id) => game.players.find((p) => p.id === id)?.userName ?? id.slice(0, 8));
+
     return (
       <section className="card waiting">
         <h3>{t("play.waitingOthers")}</h3>
+        {waitingFor.length > 0 && (
+          <p className="waiting-names">{t("play.waitingFor", { names: waitingFor.join(", ") })}</p>
+        )}
       </section>
     );
   }
